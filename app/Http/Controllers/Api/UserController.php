@@ -14,6 +14,17 @@ use App\Http\Requests\UserUpdateRequest;
 class UserController extends Controller
 {
     /**
+     * Get the middleware that should be assigned to the controller.
+     */
+    public static function middleware(): array
+    {
+        return [
+            new Middleware('permission:view role', only: ['index']),
+            new Middleware('permission:delete role', only: ['destroy'])
+        ];
+    }
+
+    /**
      * Function: Retrieve all the users
      * @param NA
      * @return responseJSON

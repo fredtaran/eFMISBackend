@@ -23,9 +23,9 @@ class PermissionSeeder extends Seeder
             "transaction",
             "uacs",
             "uacs_transaction",
-            "users",
-            "roles",
-            "permissions"
+            "user",
+            "role",
+            "permission"
         ];
         
         $actions = [
@@ -38,7 +38,7 @@ class PermissionSeeder extends Seeder
         foreach($tables as $table) {
             foreach($actions as $action) {
                 Permission::create([
-                    'name'          => $table . " " . $action,
+                    'name'          => $action . " " . $table,
                     'guard_name'    => 'sanctum',
                     'created_at'    => \Carbon\Carbon::now()->toDateTimeString(),
                     'updated_at'    => \Carbon\Carbon::now()->toDateTimeString(),

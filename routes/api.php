@@ -2,6 +2,7 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\SectionController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\RoleController;
 use App\Http\Controllers\Api\UserController;
@@ -43,6 +44,11 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
      * Routes: Resource routes for the division controller
      */
     Route::apiResource('divisions', DivisionController::class);
+
+    /**
+     * Routes: Resource routes for the section controller
+     */
+    Route::apiResource('sections', SectionController::class);
 
     /**
      * Routes: Resource routes for the line item controller

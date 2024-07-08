@@ -28,11 +28,11 @@ class DatabaseSeeder extends Seeder
 
         $user = User::create([
             'firstname'     => "Fred",
-            'middlename'   => "Polinar",
+            'middlename'    => "Polinar",
             'lastname'      => "Taran",
-            'suffix'        => "",
             'username'      => "fred.taran",
-            'password'      => Hash::make("@dmin123")
+            'password'      => Hash::make("@dmin123"),
+            'division_id'   => 1
         ]);
 
         $roleToAssign = Role::where('name', 'superadmin')->pluck('id')->toArray();
