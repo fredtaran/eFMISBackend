@@ -1,14 +1,9 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Api;
 
-use Exception;
-use App\Models\Section;
+use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\Helper\ResponseHelper;
-use Illuminate\Support\Facades\Log;
-use App\Http\Requests\SectionRequest;
-use App\Http\Requests\SectionUpdateRequest;
 
 class SectionController extends Controller
 {
@@ -72,7 +67,7 @@ class SectionController extends Controller
     }
 
     /**
-     * Function: Retrieve an individual role data
+     * Function: Retrieve an individual section data
      * @param Section $section
      * @return responseJSON
      */
@@ -93,7 +88,7 @@ class SectionController extends Controller
     }
 
     /**
-     * Function: Update a specific role
+     * Function: Update a specific section
      * @param App\Http\Requests\SectionUpdateRequest $request
      * @param Section $section
      * @return responseJSON

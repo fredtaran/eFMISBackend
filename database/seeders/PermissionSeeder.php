@@ -16,6 +16,7 @@ class PermissionSeeder extends Seeder
         $tables = [
             "allocation",
             "division",
+            "section",
             "fund source",
             "line",
             "log",

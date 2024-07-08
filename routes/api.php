@@ -2,12 +2,13 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\SectionController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\RoleController;
 use App\Http\Controllers\Api\UserController;
+use App\Http\Controllers\Api\SectionController;
 use App\Http\Controllers\Api\DivisionController;
 use App\Http\Controllers\Api\LineItemController;
+use App\Http\Controllers\Api\FundSourceController;
 use App\Http\Controllers\Api\PermissionController;
 
 Route::controller(AuthController::class)->group(function () {
@@ -54,9 +55,9 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
      * Routes: Resource routes for the line item controller
      */
     Route::apiResource('line-items', LineItemController::class);
+    
+    /**
+     * Routes: Resource routes for the fund source controller
+     */
+    Route::apiResource('fund-sources', FundSourceController::class);
 });
-
-
-// Route::get('/user', function (Request $request) {
-//     return $request->user();
-// })->middleware('auth:sanctum');

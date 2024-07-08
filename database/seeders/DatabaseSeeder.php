@@ -20,6 +20,8 @@ class DatabaseSeeder extends Seeder
             RoleSeeder::class,
             PermissionSeeder::class,
             DivisionSeeder::class,
+            SectionSeeder::class,
+            LineItemSeeder::class,
         ]);
 
         $permissions = Permission::all()->pluck('id')->toArray();
