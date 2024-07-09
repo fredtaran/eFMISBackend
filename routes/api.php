@@ -66,6 +66,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
      * Routes: Resource routes for the uacs controller
      */
     Route::apiResource('uacs', UacsController::class);
+    Route::post('uacs-bulk', [UacsController::class, 'storeInBulk']);
 
     /**
      * Routes: Resouce routes for the log controller

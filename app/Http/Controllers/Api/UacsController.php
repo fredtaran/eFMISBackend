@@ -2,13 +2,16 @@
 
 namespace App\Http\Controllers\Api;
 
+use Excel;
 use Exception;
 use App\Models\Uacs;
+use App\Imports\UacsImport;
 use Illuminate\Http\Request;
 use App\Helper\ResponseHelper;
 use App\Http\Requests\UacsRequest;
 use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\UacsBulkRequest;
 use App\Http\Requests\UacsUpdateRequest;
 
 class UacsController extends Controller
@@ -68,6 +71,27 @@ class UacsController extends Controller
         } catch (Exception $e) {
             Log::error("Unable to save new uacs. : " . $e->getMessage() . " - Line no. " . $e->getLine());
             return ResponseHelper::error(message: "Unable to save new uacs! Try again. " . $e->getMessage(), statusCode: 500);
+        }
+    }
+
+    /**
+     * Function: Store new uacs by bulk
+     * @param App\Http\Requests\UacsBulkRequest $request
+     * @return responseJSON
+     */
+    public function storeInBulk(UacsBulkRequest $request)
+    {
+        try {
+            $originalRowCount = Uacs::all()->count();
+            $import = new UacsImport;
+            $success = Excel::import($import, $request->uacs_file);
+            
+            return ResponseHelper::success(message: "Successfully retrieved the list of uacs.", data: [], statusCode: 201);
+
+            // return ResponseHelper::error(message: "Unable to save new uacs! Try again.", statusCode: 500);
+        } catch (Exception $e) {
+            Log::error("Unable to save bulk uacs. : " . $e->getMessage() . " - Line no. " . $e->getLine());
+            return ResponseHelper::error(message: "Unable to save bulk uacs! Try again. " . $e->getMessage(), statusCode: 500);
         }
     }
 
