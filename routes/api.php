@@ -4,6 +4,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\RoleController;
+use App\Http\Controllers\Api\UacsController;
 use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\Api\SectionController;
 use App\Http\Controllers\Api\DivisionController;
@@ -60,4 +61,14 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
      * Routes: Resource routes for the fund source controller
      */
     Route::apiResource('fund-sources', FundSourceController::class);
+
+    /**
+     * Routes: Resource routes for the uacs controller
+     */
+    Route::apiResource('uacs', UacsController::class);
+
+    /**
+     * Routes: Resouce routes for the log controller
+     */
+    Route::apiResource('logs', LogController::class);
 });

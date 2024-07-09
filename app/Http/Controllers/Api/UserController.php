@@ -61,6 +61,7 @@ class UserController extends Controller
                 "lastname"      => ucwords($request->lastname),
                 "suffix"        => $request->suffix,
                 "username"      => $request->username,
+                "division_id"   => $request->division,
                 "password"      => "DOHCHDNM"
             ]);
 
