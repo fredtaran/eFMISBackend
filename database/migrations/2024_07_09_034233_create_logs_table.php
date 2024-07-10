@@ -18,7 +18,7 @@ return new class extends Migration
             $table->unsignedBigInteger('from')->nullable();
             $table->unsignedBigInteger('to')->nullable();
             $table->string('activity');
-            $table->text('additional_notes');
+            $table->text('additional_notes')->nullable();
             $table->timestamps();
 
             $table->foreign('transaction_id')->references('id')->on('transactions')->cascadeOnUpdate()->nullOnDelete();

@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use App\Helper\ResponseHelper;
 use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\SectionRequest;
 
 class SectionController extends Controller
 {
@@ -88,6 +89,27 @@ class SectionController extends Controller
         } catch (Exception $e) {
             Log::error("Unable to retrieve a specific section. : " . $e->getMessage() . " - Line no. " . $e->getLine());
             return ResponseHelper::error(message: "Unable to retrieve a specific section! Try again. " . $e->getMessage(), statusCode: 500);
+        }
+    }
+
+    /**
+     * Function: Retrieve section by division
+     * @param Integer $divisionId
+     * @return responseJSON
+     */
+    public function getSectionByDivision($divisionId)
+    {
+        try {
+            $section = Section::where('division_id', $divisionId)->get();
+
+            if ($section) {
+                return ResponseHelper::success(message: "Successfully retrieved section by division.", data: $section, statusCode: 200);
+            }
+
+            return ResponseHelper::error(message: "Unable to retrieve section by division! Try again.", statusCode: 500);
+        } catch (Exception $e) {
+            Log::error("Unable to retrieve section by division. : " . $e->getMessage() . " - Line no. " . $e->getLine());
+            return ResponseHelper::error(message: "Unable to retrieve section by division! Try again. " . $e->getMessage(), statusCode: 500);
         }
     }
 

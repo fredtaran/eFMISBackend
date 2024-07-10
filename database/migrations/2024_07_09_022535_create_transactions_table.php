@@ -28,7 +28,7 @@ return new class extends Migration
             $table->decimal('dv_amount', total: 10, places: 2)->nullable();
             $table->string('dv_month')->nullable();
             $table->string('dv_year')->nullable();
-            $table->decimal('obr_unpain', total: 10, places: 2)->nullable();
+            $table->decimal('obr_unpaid', total: 10, places: 2)->nullable();
             $table->string('ada_no')->nullable();
             $table->string('ada_timestamp')->nullable();
             $table->string('activity_title')->nullable();

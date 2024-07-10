@@ -2,6 +2,7 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Api\LogController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\RoleController;
 use App\Http\Controllers\Api\UacsController;
@@ -11,6 +12,8 @@ use App\Http\Controllers\Api\DivisionController;
 use App\Http\Controllers\Api\LineItemController;
 use App\Http\Controllers\Api\FundSourceController;
 use App\Http\Controllers\Api\PermissionController;
+use App\Http\Controllers\Api\TransactionController;
+use App\Http\Controllers\Api\PurchaseDetailsController;
 
 Route::controller(AuthController::class)->group(function () {
     /**
@@ -51,6 +54,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
      * Routes: Resource routes for the section controller
      */
     Route::apiResource('sections', SectionController::class);
+    Route::get('sections-by-division/{divisionId}', [SectionController::class, 'getSectionByDivision']);
 
     /**
      * Routes: Resource routes for the line item controller
@@ -72,4 +76,18 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
      * Routes: Resouce routes for the log controller
      */
     Route::apiResource('logs', LogController::class);
+
+    /**
+     * Routes: Resource routes for the purchase detail controller
+     */
+    Route::apiResource('purchase-details', PurchaseDetailsController::class);
+    Route::get('purchase-details/by-user/{userId}', [PurchaseDetailsController::class, 'prByUser']);
+    Route::get('purchase-details/owned-and-forwarded/{userId}', [PurchaseDetailsController::class, 'ownedAndForwarded']);
+    
+    /**
+     * Routes: Resource routes for the transaction controller
+     */
+    Route::put('forward-transaction/{transactionId}', [TransactionController::class, 'forwardTransaction']);
+    Route::put('receive-transaction/{transactionId}', [TransactionController::class, 'receiveTransaction']);
+    Route::put('retract-transaction/{transactionId}', [TransactionController::class, 'rectractTransaction']);
 });

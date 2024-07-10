@@ -6,12 +6,14 @@ use Exception;
 use App\Models\User;
 use Illuminate\Http\Request;
 use App\Helper\ResponseHelper;
+use App\Http\Requests\UserRequest;
 use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
-use App\Http\Requests\UserRequest;
 use App\Http\Requests\UserUpdateRequest;
+use Illuminate\Routing\Controllers\Middleware;
+use Illuminate\Routing\Controllers\HasMiddleware;
 
-class UserController extends Controller
+class UserController extends Controller implements HasMiddleware
 {
     /**
      * Get the middleware that should be assigned to the controller.
@@ -19,8 +21,10 @@ class UserController extends Controller
     public static function middleware(): array
     {
         return [
-            new Middleware('permission:view role', only: ['index']),
-            new Middleware('permission:delete role', only: ['destroy'])
+            new Middleware('permission:view user', only: ['index', 'show']),
+            new Middleware('permission:update user', only: ['update']),
+            new Middleware('permission:create user', only: ['store']),
+            new Middleware('permission:delete user', only: ['destroy']),
         ];
     }
 
@@ -62,6 +66,7 @@ class UserController extends Controller
                 "suffix"        => $request->suffix,
                 "username"      => $request->username,
                 "division_id"   => $request->division,
+                "section_id"    => $request->section,
                 "password"      => "DOHCHDNM"
             ]);
 

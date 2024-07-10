@@ -28,6 +28,7 @@ class UserRequest extends FormRequest
             'suffix'        => [''],
             'username'      => ['required', 'unique:users,username'],
             'division'      => ['required'],
+            'section'       => ['required'],
             'roles'         => ['required']
         ];
     }
@@ -45,6 +46,7 @@ class UserRequest extends FormRequest
             'username.required'     => 'Username is required',
             'username.unique'       => 'Username must be unique',
             'division.required'     => 'Division is required',
+            'section.required'      => 'Section is required',
             'roles.required'        => 'User roles is required'
         ];
     }
