@@ -21,8 +21,8 @@ class TransactionController extends Controller implements HasMiddleware
     public static function middleware(): array
     {
         return [
-            // new Middleware('permission:view transaction', only: ['index']),
-            new Middleware('permission:update transaction', only: ['forwardTransaction']),
+            new Middleware('permission:view transaction', only: ['index', 'show']),
+            new Middleware('permission:update transaction', only: ['forwardTransaction', 'receiveTransaction', 'rectractTransaction']),
             // new Middleware('permission:create purchase_detail', only: ['store']),
             // new Middleware('permission:delete purchase_detail', only: ['destroy']),
         ];
@@ -143,6 +143,29 @@ class TransactionController extends Controller implements HasMiddleware
         } catch (Exception $e) {
             Log::error("Unable to retract transaction. : " . $e->getMessage() . " - Line no. " . $e->getLine());
             return ResponseHelper::error(message: "Unable to retract transaction! Try again. " . $e->getMessage(), statusCode: 500);
+        }
+    }
+
+    /**
+     * Function: Retrieve a specific transaction
+     * @param Integer $transactionId
+     * @return responseJSON
+     */
+    public function show($transactionId)
+    {
+        try {
+            $transactionDetail = Transaction::where('id', $transactionId)
+                                            ->with(['purchaseDetails', 'allocation', 'accounts.uacs'])
+                                            ->first();
+
+            if ($transactionDetail) {
+                return ResponseHelper::success(message: "Successfully retrieved transaction detail.", data: $transactionDetail, statusCode: 200);
+            }
+
+            return ResponseHelper::error("Unable to retrieve transaction detail", statusCode: 500);
+        } catch (Exception $e) {
+            Log::error("Unable to retrieve transaction detail. : " . $e->getMessage() . " - Line no. " . $e->getLine());
+            return ResponseHelper::error(message: "Unable to retrieve transaction detail! Try again. " . $e->getMessage(), statusCode: 500);
         }
     }
 }

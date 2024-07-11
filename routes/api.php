@@ -10,6 +10,7 @@ use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\Api\SectionController;
 use App\Http\Controllers\Api\DivisionController;
 use App\Http\Controllers\Api\LineItemController;
+use App\Http\Controllers\Api\AllocationController;
 use App\Http\Controllers\Api\FundSourceController;
 use App\Http\Controllers\Api\PermissionController;
 use App\Http\Controllers\Api\TransactionController;
@@ -65,6 +66,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
      * Routes: Resource routes for the fund source controller
      */
     Route::apiResource('fund-sources', FundSourceController::class);
+    Route::get('fund-sources/by-line-item/{lineItem}', [FundSourceController::class, 'byLineItem']);
 
     /**
      * Routes: Resource routes for the uacs controller
@@ -87,7 +89,14 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     /**
      * Routes: Resource routes for the transaction controller
      */
+    Route::apiResource('transactions', TransactionController::class);
     Route::put('forward-transaction/{transactionId}', [TransactionController::class, 'forwardTransaction']);
     Route::put('receive-transaction/{transactionId}', [TransactionController::class, 'receiveTransaction']);
     Route::put('retract-transaction/{transactionId}', [TransactionController::class, 'rectractTransaction']);
+
+    /**
+     * Routes: Resource routes for the allocation controller
+     */
+    Route::apiResource('allocations', AllocationController::class);
+    Route::get('allocations/by-line-and-fund/{lineItem}/{fundSource}', [AllocationController::class, 'byLineAndFund']);
 });

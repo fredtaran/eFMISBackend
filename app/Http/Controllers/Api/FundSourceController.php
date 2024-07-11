@@ -19,7 +19,7 @@ class FundSourceController extends Controller
     public static function middleware(): array
     {
         return [
-            new Middleware('permission:view fund source', only: ['index', 'show']),
+            new Middleware('permission:view fund source', only: ['index', 'show', 'byLineItem']),
             new Middleware('permission:update fund source', only: ['update']),
             new Middleware('permission:create fund source', only: ['store']),
             new Middleware('permission:delete fund source', only: ['destroy']),
@@ -90,6 +90,27 @@ class FundSourceController extends Controller
         } catch (Exception $e) {
             Log::error("Unable to retrieve a specific fund source. : " . $e->getMessage() . " - Line no. " . $e->getLine());
             return ResponseHelper::error(message: "Unable to retrieve a specific fund source! Try again. " . $e->getMessage(), statusCode: 500);
+        }
+    }
+
+    /**
+     * Function: Retrieve an fund source by line item
+     * @param Integer $lineItem
+     * @return responseJSON
+     */
+    public function byLineItem($lineItem)
+    {
+        try {
+            $fundSource = FundSource::where('line_id', $lineItem)->get();
+
+            if ($fundSource) {
+                return ResponseHelper::success(message: "Successfully retrieved fund sources by line item.", data: $fundSource, statusCode: 200);
+            }
+
+            return ResponseHelper::error(message: "Unable to retrieve fund sources by line item! Try again.", statusCode: 500);
+        } catch (Exception $e) {
+            Log::error("Unable to retrieve fund sources by line item. : " . $e->getMessage() . " - Line no. " . $e->getLine());
+            return ResponseHelper::error(message: "Unable to retrieve fund sources by line item! Try again. " . $e->getMessage(), statusCode: 500);
         }
     }
 
