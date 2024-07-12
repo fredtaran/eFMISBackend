@@ -15,6 +15,7 @@ class Transaction extends Model
         'allocation_id',
         'date',
         'obr_no',
+        'obr_amount',
         'obr_timestamp',
         'obr_month',
         'obr_year',
@@ -22,6 +23,7 @@ class Transaction extends Model
         'dv_no',
         'dv_timestamp',
         'dv_amount',
+        'dv_month',
         'dv_year',
         'obr_unpaid',
         'ada_no',
@@ -57,5 +59,33 @@ class Transaction extends Model
     public function accounts()
     {
         return $this->hasMany(UacsTransaction::class);
+    }
+    
+    /**
+     * Function: Add timestamps on update
+     */
+    public static function boot()
+    {
+        parent::boot();
+
+        static::updating(function ($model) {
+            if ($model->isDirty('obr_no')) {
+                $model->obr_timestamp = now();
+
+                // Add activity log here
+            }
+
+            if ($model->isDirty('dv_no')) {
+                $model->dv_timestamp = now();
+
+                // Add activity log here
+            }
+
+            if ($model->isDirty('ada_no')) {
+                $model->ada_timestamp = now();
+
+                // Add activity log here
+            }
+        });
     }
 }
