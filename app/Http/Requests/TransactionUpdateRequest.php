@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Foundation\Http\FormRequest;
 
 class TransactionUpdateRequest extends FormRequest
@@ -22,27 +23,27 @@ class TransactionUpdateRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'budget_no'     => ['required', 'unique:purchase_details,budget_no,' . $this->purchase_detail],
-            'pr_no'         => $this->checkIfPrNoIsRequired() ? 'required' : '',
-            'po_no'         => $this->checkIfPoNoIsRequired() ? 'required' : '',
-            'line_item'     => $this->checkIfOBRDetailsIsRequired() ? 'required' : '',
-            'fund_source'   => $this->checkIfOBRDetailsIsRequired() ? 'required' : '',
-            'program'       => $this->checkIfOBRDetailsIsRequired() ? 'required' : '',
-            'date'          => $this->checkIfOBRDetailsIsRequired() ? 'required' : '',
-            'creditor'      => $this->checkIfOBRDetailsIsRequired() ? 'required' : '',
+            'budget_no'     => ['required', 'unique:purchase_details,budget_no,' . $this->pr_id],
+            'pr_no'         => $this->checkIfPrNoIsRequired() && $this->requiredByRole('procurement') ? 'required' : '',
+            'po_no'         => $this->checkIfPoNoIsRequired() && $this->requiredByRole('procurement') ? 'required' : '',
+            'line_item'     => $this->checkIfOBRDetailsIsRequired() && $this->requiredByRole('budget') ? 'required' : '',
+            'fund_source'   => $this->checkIfOBRDetailsIsRequired() && $this->requiredByRole('budget') ? 'required' : '',
+            'program'       => $this->checkIfOBRDetailsIsRequired() && $this->requiredByRole('budget') ? 'required' : '',
+            'date'          => $this->checkIfOBRDetailsIsRequired() && $this->requiredByRole('budget') ? 'required' : '',
+            'creditor'      => $this->checkIfOBRDetailsIsRequired() && $this->requiredByRole('budget') ? 'required' : '',
             'saa_title'     => '',
-            'obr_no'        => $this->checkIfOBRDetailsIsRequired() ? 'required' : '',
+            'obr_no'        => $this->checkIfOBRDetailsIsRequired() && $this->requiredByRole('budget') ? 'required' : '',
             'accounts'      => '',
-            'obr_amount'    => $this->checkIfOBRDetailsIsRequired() ? 'required' : '',
-            'obr_month'     => $this->checkIfOBRDetailsIsRequired() ? 'required' : '',
-            'obr_year'      => $this->checkIfOBRDetailsIsRequired() ? 'required' : '',
-            'iar'           => $this->checkIfIarIsRequired() ? 'required' : '',
-            'dv_no'         => $this->checkIfDvIsRequired() ? 'required' : '',
-            'dv_amount'     => $this->checkIfDvIsRequired() ? 'required' : '',
-            'dv_month'      => $this->checkIfDvIsRequired() ? 'required' : '',
-            'dv_year'       => $this->checkIfDvIsRequired() ? 'required' : '',
+            'obr_amount'    => $this->checkIfOBRDetailsIsRequired() && $this->requiredByRole('budget') ? 'required' : '',
+            'obr_month'     => $this->checkIfOBRDetailsIsRequired() && $this->requiredByRole('budget') ? 'required' : '',
+            'obr_year'      => $this->checkIfOBRDetailsIsRequired() && $this->requiredByRole('budget') ? 'required' : '',
+            'iar'           => $this->checkIfIarIsRequired() && $this->requiredByRole('supply') ? 'required' : '',
+            'dv_no'         => $this->checkIfDvIsRequired() && $this->requiredByRole('accounting') ? 'required' : '',
+            'dv_amount'     => $this->checkIfDvIsRequired() && $this->requiredByRole('accounting') ? 'required' : '',
+            'dv_month'      => $this->checkIfDvIsRequired() && $this->requiredByRole('accounting') ? 'required' : '',
+            'dv_year'       => $this->checkIfDvIsRequired() && $this->requiredByRole('accounting') ? 'required' : '',
             'obr_unpaid'    => '',
-            'ada_no'        => $this->checkIfAdaIsRequired() ? 'required' : '',
+            'ada_no'        => $this->checkIfAdaIsRequired() && $this->requiredByRole('cashier') ? 'required' : '',
             'remarks'       => '',
         ];
     }
@@ -132,5 +133,18 @@ class TransactionUpdateRequest extends FormRequest
         $budgetNoExist = \App\Models\PurchaseDetail::where('budget_no', $this->input('budget_no'))->first();
         $transactionExist = \App\Models\Transaction::where('id', $budgetNoExist ? $budgetNoExist->transaction_id : '0')->first();
         return !empty($budgetNoExist) && !empty($transactionExist) && $transactionExist->dv_no != null;
+    }
+
+    // Auth::user()->roles[0]->name
+    /**
+     * Function: Check if the role makes the field required
+     */
+    public function requiredByRole($role): bool
+    {
+        if (Auth::user()->roles[0]->name == $role) {
+            return true;
+        } else {
+            return false;
+        }
     }
 }

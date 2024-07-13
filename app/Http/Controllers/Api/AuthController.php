@@ -58,7 +58,7 @@ class AuthController extends Controller
             if ($user) { 
                 $user->currentAccessToken()->delete();
 
-                return ResponseHelper::success(message: "Successfully retrieved the list of permissions.", data: [], statusCode: 200);
+                return ResponseHelper::success(message: "User successfully logged out.", data: [], statusCode: 200);
             }
 
             return ResponseHelper::error(message: "Unable to logout user.", statusCode: 500);

@@ -216,11 +216,13 @@ class TransactionController extends Controller implements HasMiddleware
                         $uacs = UacsTransaction::where('transaction_id', $transactionId)->delete();
 
                         foreach($request->accounts as $account) {
-                            UacsTransaction::create([
-                                'transaction_id'    => $transactionId,
-                                'uacs_id'           => $account['uacs_id'],
-                                'amount'            => $account['amount']
-                            ]);
+                            if ($account['uacs_id'] !== NULL) {
+                                UacsTransaction::create([
+                                    'transaction_id'    => $transactionId,
+                                    'uacs_id'           => $account['uacs_id'],
+                                    'amount'            => $account['amount']
+                                ]);
+                            }
                         }
                     }
                 }
