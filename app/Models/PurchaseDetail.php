@@ -61,6 +61,14 @@ class PurchaseDetail extends Model
                 $model->pr_timestamp = now();
 
                 // Add acitivity log here
+                $authUser = Auth::user()->firstname . " " . Auth::user()->lastname;
+
+                Log::create([
+                    'is_transaction'    => true,
+                    'transaction_id'    => $model->transaction_id,
+                    'from'              => Auth::user()->id,
+                    'activity'          => "$authUser assigned a Purchase No.: $model->pr_no to the transaction."
+                ]);
             }
 
             if ($model->isDirty('po_no')) {

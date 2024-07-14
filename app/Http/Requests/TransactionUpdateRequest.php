@@ -24,7 +24,7 @@ class TransactionUpdateRequest extends FormRequest
     {
         return [
             'budget_no'     => ['required', 'unique:purchase_details,budget_no,' . $this->pr_id],
-            'pr_no'         => $this->checkIfPrNoIsRequired() && $this->requiredByRole('procurement') ? 'required' : '',
+            'pr_no'         => [$this->checkIfPrNoIsRequired() && $this->requiredByRole('procurement') ? 'required' : '', 'unique:purchase_details,pr_no,' . $this->pr_id],
             'po_no'         => $this->checkIfPoNoIsRequired() && $this->requiredByRole('procurement') ? 'required' : '',
             'line_item'     => $this->checkIfOBRDetailsIsRequired() && $this->requiredByRole('budget') ? 'required' : '',
             'fund_source'   => $this->checkIfOBRDetailsIsRequired() && $this->requiredByRole('budget') ? 'required' : '',
@@ -59,7 +59,9 @@ class TransactionUpdateRequest extends FormRequest
             'act_title'             => '',
             'saa_title'             => '',
             'budget_no.required'    => "Budget number is required.",
+            'budget_no.unique'      => "Budget number must be unique.",
             'pr_no.required'        => "PR number is required.",
+            'pr_no.unique'          => "PR number must be unique.",
             'po_no.required'        => "PO number is required.",
             'line_item.required'    => "Line item is required.",
             'fund_source.required'  => "Fund source is required.",

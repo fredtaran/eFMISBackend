@@ -26,8 +26,8 @@ class TransactionController extends Controller implements HasMiddleware
         return [
             new Middleware('permission:view transaction', only: ['index', 'show']),
             new Middleware('permission:update transaction', only: ['forwardTransaction', 'receiveTransaction', 'rectractTransaction']),
-            // new Middleware('permission:create purchase_detail', only: ['store']),
-            // new Middleware('permission:delete purchase_detail', only: ['destroy']),
+            new Middleware('permission:create transaction', only: ['store']),
+            new Middleware('permission:delete transaction', only: ['destroy']),
         ];
     }
 

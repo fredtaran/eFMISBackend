@@ -78,6 +78,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
      * Routes: Resouce routes for the log controller
      */
     Route::apiResource('logs', LogController::class);
+    Route::post('logs/{transactionId}', [LogController::class, 'store']);
 
     /**
      * Routes: Resource routes for the purchase detail controller
@@ -100,15 +101,4 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
      */
     Route::apiResource('allocations', AllocationController::class);
     Route::get('allocations/by-line-and-fund/{lineItem}/{fundSource}', [AllocationController::class, 'byLineAndFund']);
-
-    Route::get('test', function() {
-        // dd(Auth::user());
-        foreach(Auth::user()->roles as $role) {
-            if ($role->name == 'budget') {
-                return true;
-            } else {
-                return false;
-            }
-        }
-    });
 });
