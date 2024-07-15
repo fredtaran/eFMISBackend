@@ -81,7 +81,7 @@ class PurchaseDetail extends Model
                     'is_transaction'    => true,
                     'transaction_id'    => $model->transaction_id,
                     'from'              => Auth::user()->id,
-                    'activity'          => "$authUser assigned a Purchase Orde No.: $model->po_no to the transaction."
+                    'activity'          => "$authUser assigned a Purchase Order No.: $model->po_no to the transaction."
                 ]);
             }
 
