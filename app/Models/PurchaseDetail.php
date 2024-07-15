@@ -75,6 +75,14 @@ class PurchaseDetail extends Model
                 $model->po_timestamp = now();
 
                 // Add acitivity log here
+                $authUser = Auth::user()->firstname . " " . Auth::user()->lastname;
+
+                Log::create([
+                    'is_transaction'    => true,
+                    'transaction_id'    => $model->transaction_id,
+                    'from'              => Auth::user()->id,
+                    'activity'          => "$authUser assigned a Purchase Orde No.: $model->po_no to the transaction."
+                ]);
             }
 
             if ($model->iar != $model->getOriginal('iar')) {

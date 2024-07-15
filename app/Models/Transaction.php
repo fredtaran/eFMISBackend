@@ -2,8 +2,9 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Transaction extends Model
 {
@@ -73,6 +74,14 @@ class Transaction extends Model
                 $model->obr_timestamp = now();
 
                 // Add activity log here
+                $authUser = Auth::user()->firstname . " " . Auth::user()->lastname;
+
+                Log::create([
+                    'is_transaction'    => true,
+                    'transaction_id'    => $model->id,
+                    'from'              => Auth::user()->id,
+                    'activity'          => "$authUser updated registry details and added an OBR No.: $model->obr_no to the transaction."
+                ]);
             }
 
             if ($model->isDirty('dv_no')) {
