@@ -236,4 +236,34 @@ class TransactionController extends Controller implements HasMiddleware
             return ResponseHelper::error(message: "Unable to update transaction! Try again. " . $e->getMessage(), statusCode: 500);
         }
     }
+
+    /**
+     * Function: Get DV number
+     * @param $obrNo
+     * @return responseJSON
+     */
+    public function getDv($obrNo)
+    {
+        try {
+            $transaction = Transaction::where('obr_no', $obrNo)->first();
+
+            if (!empty($transaction)) {
+                return ResponseHelper::success(message: "Successfully retrieved transaction detail.", data: $transaction->dv_no, statusCode: 200);
+            } else {
+                $latestDvNumber = Transaction::where('dv_no', '!=', null)->orderBy('dv_timestamp', 'ASC');
+
+                if (!empty($latestDvNumber)) {
+                    $year = date('Y');
+                    $month = date('m');
+                    $day = date('d');
+                    $newDvNumber = "DV-$year-$month-$day-001";
+                }
+
+                return ResponseHelper::success(message: "Successfully retrieved transaction detail.", data: $newDvNumber, statusCode: 200);
+            }
+        } catch (Exception $e) {
+            Log::error("Unable to retrieve DV number. : " . $e->getMessage() . " - Line no. " . $e->getLine());
+            return ResponseHelper::error(message: "Unable to retrieve DV number! Try again. " . $e->getMessage(), statusCode: 500);
+        }
+    }
 }

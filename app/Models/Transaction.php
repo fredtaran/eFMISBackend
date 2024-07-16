@@ -88,12 +88,40 @@ class Transaction extends Model
                 $model->dv_timestamp = now();
 
                 // Add activity log here
+                $authUser = Auth::user()->firstname . " " . Auth::user()->lastname;
+
+                Log::create([
+                    'is_transaction'    => true,
+                    'transaction_id'    => $model->id,
+                    'from'              => Auth::user()->id,
+                    'activity'          => "$authUser received the goods and generated the Disbursement No.: $model->dv_no to the transaction."
+                ]);
             }
 
             if ($model->isDirty('ada_no')) {
                 $model->ada_timestamp = now();
 
+                // // Add activity log here
+                // $authUser = Auth::user()->firstname . " " . Auth::user()->lastname;
+
+                // Log::create([
+                //     'is_transaction'    => true,
+                //     'transaction_id'    => $model->id,
+                //     'from'              => Auth::user()->id,
+                //     'activity'          => "$authUser updated the registry details to the transaction."
+                // ]);
+            }
+
+            if ($model->isDirty('dv_amount')) {
                 // Add activity log here
+                $authUser = Auth::user()->firstname . " " . Auth::user()->lastname;
+
+                Log::create([
+                    'is_transaction'    => true,
+                    'transaction_id'    => $model->id,
+                    'from'              => Auth::user()->id,
+                    'activity'          => "$authUser updated the disbursement details of the transaction."
+                ]);
             }
         });
     }
