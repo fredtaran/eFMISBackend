@@ -101,15 +101,15 @@ class Transaction extends Model
             if ($model->isDirty('ada_no')) {
                 $model->ada_timestamp = now();
 
-                // // Add activity log here
-                // $authUser = Auth::user()->firstname . " " . Auth::user()->lastname;
+                // Add activity log here
+                $authUser = Auth::user()->firstname . " " . Auth::user()->lastname;
 
-                // Log::create([
-                //     'is_transaction'    => true,
-                //     'transaction_id'    => $model->id,
-                //     'from'              => Auth::user()->id,
-                //     'activity'          => "$authUser updated the registry details to the transaction."
-                // ]);
+                Log::create([
+                    'is_transaction'    => true,
+                    'transaction_id'    => $model->id,
+                    'from'              => Auth::user()->id,
+                    'activity'          => "$authUser updated ADA/Check details of the transaction."
+                ]);
             }
 
             if ($model->isDirty('dv_amount')) {
