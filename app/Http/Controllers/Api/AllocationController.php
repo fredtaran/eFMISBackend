@@ -20,10 +20,10 @@ class AllocationController extends Controller implements HasMiddleware
     public static function middleware(): array
     {
         return [
-            new Middleware('permission:view allocation', only: ['index']),
-            // new Middleware('permission:update allocation', only: ['update']),
+            new Middleware('permission:view allocation', only: ['index', 'byLineAndFund']),
+            new Middleware('permission:update allocation', only: ['']),
             new Middleware('permission:create allocation', only: ['store']),
-            // new Middleware('permission:delete allocation', only: ['destroy']),
+            new Middleware('permission:delete allocation', only: ['']),
         ];
     }
 

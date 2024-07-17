@@ -7,6 +7,7 @@ use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\RoleController;
 use App\Http\Controllers\Api\UacsController;
 use App\Http\Controllers\Api\UserController;
+use App\Http\Controllers\Api\ReportController;
 use App\Http\Controllers\Api\SectionController;
 use App\Http\Controllers\Api\DivisionController;
 use App\Http\Controllers\Api\LineItemController;
@@ -102,4 +103,9 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
      */
     Route::apiResource('allocations', AllocationController::class);
     Route::get('allocations/by-line-and-fund/{lineItem}/{fundSource}', [AllocationController::class, 'byLineAndFund']);
+
+    /**
+     * Routes: Route for the reports
+     */
+    Route::get('get-summary', [ReportController::class, 'summaryReport']);
 });
