@@ -25,9 +25,9 @@ class PurchaseDetailsController extends Controller implements HasMiddleware
     {
         return [
             new Middleware('permission:view purchase_detail', only: ['index', 'prByUser', 'ownedAndForwarded']),
-            // new Middleware('permission:update purchase_detail', only: ['update']),
+            new Middleware('permission:update purchase_detail', only: []),
             new Middleware('permission:create purchase_detail', only: ['store']),
-            // new Middleware('permission:delete purchase_detail', only: ['destroy']),
+            new Middleware('permission:delete purchase_detail', only: []),
         ];
     }
 
@@ -60,19 +60,17 @@ class PurchaseDetailsController extends Controller implements HasMiddleware
     public function prByUser($userId)
     {
         try {
-            $purchaseDetails = PurchaseDetail::with('transaction')
-                                            ->whereHas('transaction', function ($query) use ($userId) {
-                                                $query->where('creator', $userId);
-                                            })
+            $transactions = Transaction::where('creator', $userId)
+                                            ->with(['purchaseDetails'])
                                             ->get();
 
-            if ($purchaseDetails) {
-                return ResponseHelper::success(message: "Successfully retrieved the list of purchase.", data: $purchaseDetails, statusCode: 200);
+            if ($transactions) {
+                return ResponseHelper::success(message: "Successfully retrieved the list of transactions.", data: $transactions, statusCode: 200);
             }
 
-            return ResponseHelper::error("Unable to retrieve list of purchase", statusCode: 500);
+            return ResponseHelper::error("Unable to retrieve list of transactions", statusCode: 500);
         } catch (Exception $e) {
-            Log::error("Unable to retrieve list of purchase. : " . $e->getMessage() . " - Line no. " . $e->getLine());
+            Log::error("Unable to retrieve list of transactions. : " . $e->getMessage() . " - Line no. " . $e->getLine());
             return ResponseHelper::error(message: "Unable to retrieve list of purchase! Try again. " . $e->getMessage(), statusCode: 500);
         }
     }
@@ -85,23 +83,22 @@ class PurchaseDetailsController extends Controller implements HasMiddleware
     public function ownedAndForwarded($userId)
     {
         try {
-            $purchaseDetails = PurchaseDetail::with('transaction')
-                                            ->whereHas('transaction', function ($query) use ($userId) {
-                                                $query->where('creator', $userId)
-                                                        ->orWhere('to', $userId)
-                                                        ->orWhere('from', $userId)
-                                                        ->where('received', false);
-                                            })
-                                            ->get();
+            $transactions = Transaction::query()
+                                        ->where('received', false)
+                                        ->where('creator', $userId)
+                                        ->orWhere('to', $userId)
+                                        ->orWhere('from', $userId)
+                                        ->with(['purchaseDetails'])
+                                        ->get();
 
-            if ($purchaseDetails) {
-                return ResponseHelper::success(message: "Successfully retrieved the list of purchase.", data: $purchaseDetails, statusCode: 200);
+            if ($transactions) {
+                return ResponseHelper::success(message: "Successfully retrieved the list of transaction.", data: $transactions, statusCode: 200);
             }
 
-            return ResponseHelper::error("Unable to retrieve list of purchase", statusCode: 500);
+            return ResponseHelper::error("Unable to retrieve list of transaction", statusCode: 500);
         } catch (Exception $e) {
-            Log::error("Unable to retrieve list of purchase. : " . $e->getMessage() . " - Line no. " . $e->getLine());
-            return ResponseHelper::error(message: "Unable to retrieve list of purchase! Try again. " . $e->getMessage(), statusCode: 500);
+            Log::error("Unable to retrieve list of transaction. : " . $e->getMessage() . " - Line no. " . $e->getLine());
+            return ResponseHelper::error(message: "Unable to retrieve list of transaction! Try again. " . $e->getMessage(), statusCode: 500);
         }
     }
 

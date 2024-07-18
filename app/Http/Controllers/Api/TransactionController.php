@@ -12,8 +12,10 @@ use App\Models\Log as ActivityLog;
 use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
+use App\Http\Requests\TransactionRequest;
 use Illuminate\Routing\Controllers\Middleware;
 use App\Http\Requests\TransactionUpdateRequest;
+use App\Http\Requests\PrTransactionUpdateRequest;
 use Illuminate\Routing\Controllers\HasMiddleware;
 
 class TransactionController extends Controller implements HasMiddleware
@@ -27,7 +29,7 @@ class TransactionController extends Controller implements HasMiddleware
             new Middleware('permission:view transaction', only: ['index', 'show']),
             new Middleware('permission:update transaction', only: ['forwardTransaction', 'receiveTransaction', 'rectractTransaction']),
             new Middleware('permission:create transaction', only: ['store']),
-            new Middleware('permission:delete transaction', only: ['destroy']),
+            new Middleware('permission:delete transaction', only: ['']),
         ];
     }
 
@@ -174,10 +176,10 @@ class TransactionController extends Controller implements HasMiddleware
 
     /**
      * Function: Update validation
-     * @param App\Http\Requests\TransactionUpdateRequest $request
+     * @param App\Http\Requests\PrTransactionUpdateRequest $request
      * @return responseJSON
      */
-    public function updateTransaction(TransactionUpdateRequest $request, $transactionId)
+    public function updateTransaction(PrTransactionUpdateRequest $request, $transactionId)
     {
         try {
             $transactionDetail = Transaction::findOrFail($transactionId);
@@ -239,31 +241,129 @@ class TransactionController extends Controller implements HasMiddleware
 
     /**
      * Function: Get DV number
-     * @param $obrNo
+     * @param $transactionId
      * @return responseJSON
      */
-    public function getDv($obrNo)
+    public function getDv($transactionId)
     {
         try {
-            $transaction = Transaction::where('obr_no', $obrNo)->first();
+            $transaction = Transaction::findOrFail($transactionId);
 
-            if (!empty($transaction)) {
-                return ResponseHelper::success(message: "Successfully retrieved transaction detail.", data: $transaction->dv_no, statusCode: 200);
+            if ($transaction->dv_no) {
+                return ResponseHelper::success(message: "Successfully retrieved transaction detailx.", data: $transaction->dv_no, statusCode: 200);
             } else {
-                $latestDvNumber = Transaction::where('dv_no', '!=', null)->orderBy('dv_timestamp', 'ASC');
+                $latestDvNumber = Transaction::where('dv_no', '!=', null)->orderBy('dv_timestamp', 'ASC')->first();
 
-                if (!empty($latestDvNumber)) {
+                if (empty($latestDvNumber)) {
                     $year = date('Y');
                     $month = date('m');
                     $day = date('d');
                     $newDvNumber = "DV-$year-$month-$day-001";
-                }
 
-                return ResponseHelper::success(message: "Successfully retrieved transaction detail.", data: $newDvNumber, statusCode: 200);
+                    return ResponseHelper::success(message: "Successfully retrieved transaction detaila.", data: $newDvNumber, statusCode: 200);
+                } else {
+                    $explodedDvNumber = explode('-', $latestDvNumber->dv_no);
+                    $explodedDvNumber[4] = str_pad($explodedDvNumber[4] + 1, 3, '0', STR_PAD_LEFT);
+                    $implodedDvNumber = implode('-', $explodedDvNumber);
+                    return ResponseHelper::success(message: "Successfully retrieved transaction detaila.", data: $implodedDvNumber, statusCode: 200);
+                }
             }
         } catch (Exception $e) {
             Log::error("Unable to retrieve DV number. : " . $e->getMessage() . " - Line no. " . $e->getLine());
             return ResponseHelper::error(message: "Unable to retrieve DV number! Try again. " . $e->getMessage(), statusCode: 500);
+        }
+    }
+
+    /**
+     * Function: Save a new transaction
+     * @param App\Http\Requests\TransactionRequest
+     * @return responseJSON
+     */
+    public function store(TransactionRequest $request)
+    {
+        try {
+            $transactionDetail = Transaction::create([
+                'creator'           => Auth::user()->id,
+                'is_pr'             => 0,
+                'from'              => Auth::user()->id,
+                'to'                => Auth::user()->id,
+                'received'          => 1,
+                'reference_no'      => $request->reference_no,
+                'activity_title'    => $request->activity_title
+            ]);
+
+            if ($transactionDetail) {
+                $name = Auth::user()->firstname . " " . Auth::user()->lastname;
+                
+                ActivityLog::create([
+                    'is_transaction'    => 1,
+                    'transaction_id'    => $transactionDetail->id,
+                    'from'              => Auth::user()->id,
+                    'activity'          => "$name added a new transaction with reference number: $request->reference_no"
+                ]);
+
+                return ResponseHelper::success(message: "Successfully save a new transaction.", data: $transactionDetail, statusCode: 200);
+            }
+
+            return ResponseHelper::error("Unable to save a new transaction", statusCode: 500);
+        } catch  (Exception $e) {
+            Log::error("Unable to save a new transaction. : " . $e->getMessage() . " - Line no. " . $e->getLine());
+            return ResponseHelper::error(message: "Unable to save a new transaction! Try again. " . $e->getMessage(), statusCode: 500);
+        }
+    }
+
+    /**
+     * Function: Update other transactions (e.g: TEV and others)
+     * @param App\Http\Requests\TransactionUpdateRequest $request
+     * @param $transactionId
+     * @return responseJSON
+     */
+    public function updateOtherTransaction(TransactionUpdateRequest $request, $transactionId)
+    {
+        try {
+            $transaction = Transaction::findOrFail($transactionId);
+
+            if ($transaction) {
+                $transaction->update([
+                    'allocation_id'     => $request->program,
+                    'date'              => $request->date,
+                    'obr_no'            => $request->obr_no,
+                    'obr_amount'        => $request->obr_amount,
+                    'obr_month'         => $request->obr_month,
+                    'obr_year'          => $request->obr_year,
+                    'creditor'          => $request->creditor,
+                    'dv_no'             => $request->dv_no,
+                    'dv_amount'         => $request->dv_amount,
+                    'dv_month'          => $request->dv_month,
+                    'dv_year'           => $request->dv_year,
+                    'obr_unpaid'        => $request->obr_unpaid,
+                    'ada_no'            => $request->ada_no,
+                    'activity_title'    => $request->act_title,
+                    'saa_title'         => $request->saa_title,
+                    'remarks'           => $request->remarks,
+                ]);
+
+                if (count($request->accounts)) {
+                    $uacs = UacsTransaction::where('transaction_id', $transactionId)->delete();
+
+                    foreach($request->accounts as $account) {
+                        if ($account['uacs_id'] !== NULL) {
+                            UacsTransaction::create([
+                                'transaction_id'    => $transactionId,
+                                'uacs_id'           => $account['uacs_id'],
+                                'amount'            => $account['amount']
+                            ]);
+                        }
+                    }
+                }
+
+                return ResponseHelper::success(message: "Successfully save a new transaction.", data: $transaction, statusCode: 200);
+            }
+
+            return ResponseHelper::error("Unable to update transaction", statusCode: 500);
+        } catch (Exception $e) {
+            Log::error("Unable to update transaction. : " . $e->getMessage() . " - Line no. " . $e->getLine());
+            return ResponseHelper::error(message: "Unable to update transaction! Try again. " . $e->getMessage(), statusCode: 500);
         }
     }
 }

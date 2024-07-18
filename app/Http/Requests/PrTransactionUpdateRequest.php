@@ -5,7 +5,7 @@ namespace App\Http\Requests;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Foundation\Http\FormRequest;
 
-class TransactionUpdateRequest extends FormRequest
+class PrTransactionUpdateRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -23,17 +23,21 @@ class TransactionUpdateRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'line_item'     => $this->requiredByRole('budget') ? 'required' : '',
-            'fund_source'   => $this->requiredByRole('budget') ? 'required' : '',
-            'program'       => $this->requiredByRole('budget') ? 'required' : '',
-            'date'          => $this->requiredByRole('budget') ? 'required' : '',
-            'creditor'      => $this->requiredByRole('budget') ? 'required' : '',
+            'budget_no'     => ['required', 'unique:purchase_details,budget_no,' . $this->pr_id],
+            'pr_no'         => [$this->checkIfPrNoIsRequired() && $this->requiredByRole('procurement') ? 'required' : '', 'unique:purchase_details,pr_no,' . $this->pr_id],
+            'po_no'         => $this->checkIfPoNoIsRequired() && $this->requiredByRole('procurement') ? 'required' : '',
+            'line_item'     => $this->checkIfOBRDetailsIsRequired() && $this->requiredByRole('budget') ? 'required' : '',
+            'fund_source'   => $this->checkIfOBRDetailsIsRequired() && $this->requiredByRole('budget') ? 'required' : '',
+            'program'       => $this->checkIfOBRDetailsIsRequired() && $this->requiredByRole('budget') ? 'required' : '',
+            'date'          => $this->checkIfOBRDetailsIsRequired() && $this->requiredByRole('budget') ? 'required' : '',
+            'creditor'      => $this->checkIfOBRDetailsIsRequired() && $this->requiredByRole('budget') ? 'required' : '',
             'saa_title'     => '',
-            'obr_no'        => $this->requiredByRole('budget') ? 'required' : '',
+            'obr_no'        => $this->checkIfOBRDetailsIsRequired() && $this->requiredByRole('budget') ? 'required' : '',
             'accounts'      => '',
-            'obr_amount'    => $this->requiredByRole('budget') ? 'required' : '',
-            'obr_month'     => $this->requiredByRole('budget') ? 'required' : '',
-            'obr_year'      => $this->requiredByRole('budget') ? 'required' : '',
+            'obr_amount'    => $this->checkIfOBRDetailsIsRequired() && $this->requiredByRole('budget') ? 'required' : '',
+            'obr_month'     => $this->checkIfOBRDetailsIsRequired() && $this->requiredByRole('budget') ? 'required' : '',
+            'obr_year'      => $this->checkIfOBRDetailsIsRequired() && $this->requiredByRole('budget') ? 'required' : '',
+            'iar'           => $this->checkIfIarIsRequired() && $this->requiredByRole('supply') ? 'required' : '',
             'dv_no'         => $this->checkIfDvIsRequired() && $this->requiredByRole('accounting') ? 'required' : '',
             'dv_amount'     => $this->checkIfDvIsRequired() && $this->requiredByRole('accounting') ? 'required' : '',
             'dv_month'      => $this->checkIfDvIsRequired() && $this->requiredByRole('accounting') ? 'required' : '',
@@ -54,6 +58,11 @@ class TransactionUpdateRequest extends FormRequest
         return [
             'act_title'             => '',
             'saa_title'             => '',
+            'budget_no.required'    => "Budget number is required.",
+            'budget_no.unique'      => "Budget number must be unique.",
+            'pr_no.required'        => "PR number is required.",
+            'pr_no.unique'          => "PR number must be unique.",
+            'po_no.required'        => "PO number is required.",
             'line_item.required'    => "Line item is required.",
             'fund_source.required'  => "Fund source is required.",
             'program.required'      => "Program is required.",
@@ -63,12 +72,50 @@ class TransactionUpdateRequest extends FormRequest
             'obr_amount.required'   => "Obligation amount is required.",
             'obr_month.required'    => "Month obligated is required.",
             'obr_year.required'     => "Year obligated is required.",
+            'iar.required'          => "Inspection and Acceptance is required.",
             'dv_no.required'        => "DV number is required.",
             'dv_amount.required'    => "Amount disbursed is required.",
             'dv_month.required'     => "Month disbursed is required.",
             'dv_year.required'      => "Year disbursed is required.",
             'ada_no.required'       => "ADA/Check number is required.",
         ];
+    }
+
+    /**
+     * Function: Check if the pr number is required
+     */
+    public function checkIfPrNoIsRequired(): bool
+    {
+        $budgetNoExist = \App\Models\PurchaseDetail::where('budget_no', $this->input('budget_no'))->first();
+        return !empty($budgetNoExist) && $budgetNoExist->budget_no != null;
+    }
+
+    /**
+     * Function: Check if the po no is empty
+     */
+    public function checkIfPoNoIsRequired(): bool
+    {
+        $budgetNoExist = \App\Models\PurchaseDetail::where('budget_no', $this->input('budget_no'))->first();
+        return !empty($budgetNoExist) && $budgetNoExist->pr_no != null;
+    }
+
+    /**
+     * Function: Check if the po no is empty
+     */
+    public function checkIfOBRDetailsIsRequired(): bool
+    {
+        $budgetNoExist = \App\Models\PurchaseDetail::where('budget_no', $this->input('budget_no'))->first();
+        return !empty($budgetNoExist) && $budgetNoExist->po_no != null;
+    }
+
+    /**
+     * Function: Check if the OBR number is empty
+     */
+    public function checkIfIarIsRequired(): bool
+    {
+        $budgetNoExist = \App\Models\PurchaseDetail::where('budget_no', $this->input('budget_no'))->first();
+        $transactionExist = \App\Models\Transaction::where('id', $budgetNoExist ? $budgetNoExist->transaction_id : '0')->first();
+        return !empty($budgetNoExist) && !empty($transactionExist) && $transactionExist->obr_no != null;
     }
 
     /**

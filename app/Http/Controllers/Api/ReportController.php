@@ -23,15 +23,15 @@ class ReportController extends Controller
         try {
             if ($request->query('allocation_id') == 0) {
                 $transactions['annual_allocation']  = Allocation::query()->where('year', date('Y'))->sum("amount");
-                $transactions['obr_q1'] = Transaction::all()->where('year', date('Y'))->whereIn('obr_month', [1, 2, 3])->sum("obr_amount");
-                $transactions['obr_q2'] = Transaction::all()->where('year', date('Y'))->whereIn('obr_month', [4, 5, 6])->sum("obr_amount");
-                $transactions['obr_q3'] = Transaction::all()->where('year', date('Y'))->whereIn('obr_month', [7, 8, 9])->sum("obr_amount");
-                $transactions['obr_q4'] = Transaction::all()->where('year', date('Y'))->whereIn('obr_month', [10, 11, 12])->sum("obr_amount");
+                $transactions['obr_q1'] = Transaction::all()->whereIn('obr_month', [1, 2, 3])->sum("obr_amount");
+                $transactions['obr_q2'] = Transaction::all()->whereIn('obr_month', [4, 5, 6])->sum("obr_amount");
+                $transactions['obr_q3'] = Transaction::all()->whereIn('obr_month', [7, 8, 9])->sum("obr_amount");
+                $transactions['obr_q4'] = Transaction::all()->whereIn('obr_month', [10, 11, 12])->sum("obr_amount");
                 $total_obr = $transactions['obr_q1'] + $transactions['obr_q2'] + $transactions['obr_q3'] + $transactions['obr_q4'];
-                $transactions['d_q1'] = Transaction::all()->where('year', date('Y'))->whereIn('dv_month', [1, 2, 3])->sum("dv_amount");
-                $transactions['d_q2'] = Transaction::all()->where('year', date('Y'))->whereIn('dv_month', [4, 5, 6])->sum("dv_amount");
-                $transactions['d_q3'] = Transaction::all()->where('year', date('Y'))->whereIn('dv_month', [7, 8, 9])->sum("dv_amount");
-                $transactions['d_q4'] = Transaction::all()->where('year', date('Y'))->whereIn('dv_month', [10, 11, 12])->sum("dv_amount");
+                $transactions['d_q1'] = Transaction::all()->whereIn('dv_month', [1, 2, 3])->sum("dv_amount");
+                $transactions['d_q2'] = Transaction::all()->whereIn('dv_month', [4, 5, 6])->sum("dv_amount");
+                $transactions['d_q3'] = Transaction::all()->whereIn('dv_month', [7, 8, 9])->sum("dv_amount");
+                $transactions['d_q4'] = Transaction::all()->whereIn('dv_month', [10, 11, 12])->sum("dv_amount");
                 $total_disbursement = $transactions['d_q1'] + $transactions['d_q2'] + $transactions['d_q3'] + $transactions['d_q4'];
                 $transactions['annual_balance'] = $transactions['annual_allocation'] - $total_disbursement;
                 if ($transactions['annual_allocation'] !== 0) {
@@ -43,15 +43,15 @@ class ReportController extends Controller
                 return ResponseHelper::success(message: "Summary report retrieved successfully!", data: $transactions, statusCode: 200);
             } else {
                 $transactions['annual_allocation']  = Allocation::all()->where('id', $request->query('allocation_id'))->sum("amount");
-                $transactions['obr_q1'] = Transaction::all()->where('allocation_id', $request->query('allocation_id'))->where('year', date('Y'))->whereIn('obr_month', [1, 2, 3])->sum("obr_amount");
-                $transactions['obr_q2'] = Transaction::all()->where('allocation_id', $request->query('allocation_id'))->where('year', date('Y'))->whereIn('obr_month', [4, 5, 6])->sum("obr_amount");
-                $transactions['obr_q3'] = Transaction::all()->where('allocation_id', $request->query('allocation_id'))->where('year', date('Y'))->whereIn('obr_month', [7, 8, 9])->sum("obr_amount");
-                $transactions['obr_q4'] = Transaction::all()->where('allocation_id', $request->query('allocation_id'))->where('year', date('Y'))->whereIn('obr_month', [10, 11, 12])->sum("obr_amount");
+                $transactions['obr_q1'] = Transaction::all()->where('allocation_id', $request->query('allocation_id'))->whereIn('obr_month', [1, 2, 3])->sum("obr_amount");
+                $transactions['obr_q2'] = Transaction::all()->where('allocation_id', $request->query('allocation_id'))->whereIn('obr_month', [4, 5, 6])->sum("obr_amount");
+                $transactions['obr_q3'] = Transaction::all()->where('allocation_id', $request->query('allocation_id'))->whereIn('obr_month', [7, 8, 9])->sum("obr_amount");
+                $transactions['obr_q4'] = Transaction::all()->where('allocation_id', $request->query('allocation_id'))->whereIn('obr_month', [10, 11, 12])->sum("obr_amount");
                 $total_obr = $transactions['obr_q1'] + $transactions['obr_q2'] + $transactions['obr_q3'] + $transactions['obr_q4'];
-                $transactions['d_q1'] = Transaction::all()->where('allocation_id', $request->query('allocation_id'))->where('year', date('Y'))->whereIn('dv_month', [1, 2, 3])->sum("dv_amount");
-                $transactions['d_q2'] = Transaction::all()->where('allocation_id', $request->query('allocation_id'))->where('year', date('Y'))->whereIn('dv_month', [4, 5, 6])->sum("dv_amount");
-                $transactions['d_q3'] = Transaction::all()->where('allocation_id', $request->query('allocation_id'))->where('year', date('Y'))->whereIn('dv_month', [7, 8, 9])->sum("dv_amount");
-                $transactions['d_q4'] = Transaction::all()->where('allocation_id', $request->query('allocation_id'))->where('year', date('Y'))->whereIn('dv_month', [10, 11, 12])->sum("dv_amount");
+                $transactions['d_q1'] = Transaction::all()->where('allocation_id', $request->query('allocation_id'))->whereIn('dv_month', [1, 2, 3])->sum("dv_amount");
+                $transactions['d_q2'] = Transaction::all()->where('allocation_id', $request->query('allocation_id'))->whereIn('dv_month', [4, 5, 6])->sum("dv_amount");
+                $transactions['d_q3'] = Transaction::all()->where('allocation_id', $request->query('allocation_id'))->whereIn('dv_month', [7, 8, 9])->sum("dv_amount");
+                $transactions['d_q4'] = Transaction::all()->where('allocation_id', $request->query('allocation_id'))->whereIn('dv_month', [10, 11, 12])->sum("dv_amount");
                 $total_disbursement = $transactions['d_q1'] + $transactions['d_q2'] + $transactions['d_q3'] + $transactions['d_q4'];
                 $transactions['annual_balance'] = $transactions['annual_allocation'] - $total_disbursement;
                 $transactions['annual_obr']  = round(($total_obr / $transactions['annual_allocation']) * 100, 2);

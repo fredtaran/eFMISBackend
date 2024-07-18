@@ -96,7 +96,8 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::put('receive-transaction/{transactionId}', [TransactionController::class, 'receiveTransaction']);
     Route::put('retract-transaction/{transactionId}', [TransactionController::class, 'rectractTransaction']);
     Route::put('update-transaction/{transactionId}', [TransactionController::class, 'updateTransaction']);
-    Route::get('/transactions/get-dv/{obrNo}', [TransactionController::class, 'getDv']);
+    Route::put('update-transaction/{transactionId}/others', [TransactionController::class, 'updateOtherTransaction']);
+    Route::get('/transactions/get-dv/{transactionId}', [TransactionController::class, 'getDv']);
 
     /**
      * Routes: Resource routes for the allocation controller
