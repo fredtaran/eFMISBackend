@@ -22,4 +22,12 @@ class UacsTransaction extends Model
     {
         return $this->belongsTo(Uacs::class, 'uacs_id');
     }
+
+    /**
+     * Function:
+     */
+    public function transactions()
+    {
+        return $this->belongsTo(Transaction::class, 'transaction_id');
+    }
 }

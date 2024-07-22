@@ -109,4 +109,23 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
      * Routes: Route for the reports
      */
     Route::get('get-summary', [ReportController::class, 'summaryReport']);
+    Route::get('get-report', [ReportController::class, 'getReportByAccountTitle']);
 });
+
+// Route::get('test', function() {
+//     $iv = openssl_random_pseudo_bytes(16);
+
+//     $binaryKey = pack('q', env('APP_KEY'));
+
+//     $data = "HAHAHHAHA, mao lge na akoa ingon. Ka remember ka atong the other day? katong nakita nato sila sa mall?";
+
+//     $ciphertext = openssl_encrypt($data, 'AES-256-CBC', $binaryKey, OPENSSL_RAW_DATA, $iv);
+//     $decrypted = openssl_decrypt($ciphertext, 'AES-256-CBC', $binaryKey, OPENSSL_RAW_DATA, $iv);
+
+//     echo "IV: ";
+//     print_r(bin2hex($iv));
+//     echo "\nCiphertext: ";
+//     print_r(bin2hex($ciphertext));
+//     echo "\nDecrypted text: ";
+//     print_r($decrypted);
+// }); 

@@ -3,10 +3,13 @@
 namespace App\Http\Controllers\Api;
 
 use Exception;
+use Carbon\Carbon;
+use App\Models\Uacs;
 use App\Models\Allocation;
 use App\Models\Transaction;
 use Illuminate\Http\Request;
 use App\Helper\ResponseHelper;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
 
@@ -67,5 +70,81 @@ class ReportController extends Controller
             Log::error("Unable to retrieved summary report: " . $e->getMessage() . " - Line No. " . $e->getLine());
             return ResponseHelper::error(message: "Unable to retrieve summary report! Try again. " . $e->getMessage(), statusCode: 500);
         }
+    }
+
+    /**
+     * Function: Retrieve report
+     * @param Illuminate\Http\Request $request
+     * @return responseJSON
+     */
+    public function getReportByAccountTitle(Request $request)
+    {
+        try {
+            // Initialize an empty array to hold the final result
+            $allMonthsReport = [];
+
+            // Get all months for the current year
+            $months = $this->getAllMonthsForYear($request->query('year'), $request->query('quarter'));
+
+            switch ($request->query('quarter')) {
+                case 1:
+                    $qtr = '1,2,3';
+                    break;
+                case 2:
+                    $qtr = '1,2,3,4,5,6';
+                    break;
+                case 3:
+                    $qtr = '1,2,3,4,5,6,7,8,9';
+                    break;
+                case 4:
+                    $qtr = '1,2,3,4,5,6,7,8,9,10,11,12';
+                    break;
+                default:
+                    break;
+            }
+
+            $transactions = DB::table('transactions')
+                                ->join('uacs_transactions', 'transactions.id', '=', 'uacs_transactions.transaction_id')
+                                ->join('uacs', 'uacs_transactions.uacs_id', '=', 'uacs.id')
+                                ->select(
+                                    DB::raw("LPAD(obr_month, 2, '0') AS month"),
+                                    'uacs.title',
+                                    DB::raw("SUM(transactions.obr_amount) AS total_obr_amount")
+                                )
+                                ->whereIn('obr_month', explode(',', $qtr))
+                                ->groupBy('obr_year', 'obr_month', 'uacs.title')
+                                ->orderBy('obr_year', 'ASC')
+                                ->orderBy('obr_month', 'ASC')
+                                ->get();
+
+            // Merge the fetched transactions with the list of months
+            foreach ($months as $month) {
+
+                $reportEntry = [
+                    'month' => $month,
+                    'total_obr_amount' => $transactions->firstWhere('month', $month)->total_obr_amount ?? 0,
+                ];
+                $allMonthsReport[$month] = $reportEntry;
+            }
+
+            return ResponseHelper::success(message: "Summary report retrieved successfully!", data: $transactions->groupBy('title'), statusCode: 200);
+        } catch (Exception $e) {
+            Log::error("Unable to retrieved report: " . $e->getMessage() . " - Line No. " . $e->getLine());
+            return ResponseHelper::error(message: "Unable to retrieve report! Try again. " . $e->getMessage(), statusCode: 500);
+        }
+    }
+
+    /**
+     * Function: Get months
+     * @param Integer $year
+     * @return Array $months
+     */
+    public function getAllMonthsForYear($year, $qtr)
+    {
+        $months = [];
+        for ($i = 1; $i <= $qtr * 3; $i++) {
+            $months[] = Carbon::create($year, $i)->startOfMonth()->format('m');
+        }
+        return $months;
     }
 }

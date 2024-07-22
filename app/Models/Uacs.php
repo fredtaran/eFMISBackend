@@ -13,4 +13,10 @@ class Uacs extends Model
         'title',
         'code'
     ];
+
+
+    public function uacs_transactions()
+    {
+        return $this->hasMany(UacsTransaction::class);
+    }
 }
