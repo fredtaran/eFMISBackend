@@ -109,7 +109,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
      * Routes: Route for the reports
      */
     Route::get('get-summary', [ReportController::class, 'summaryReport']);
-    Route::get('get-report', [ReportController::class, 'getReportByAccountTitle']);
+    Route::get('get-report-by-account-title', [ReportController::class, 'getReportByAccountTitle']);
 });
 
 // Route::get('test', function() {

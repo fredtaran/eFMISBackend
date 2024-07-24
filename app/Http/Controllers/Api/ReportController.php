@@ -80,71 +80,43 @@ class ReportController extends Controller
     public function getReportByAccountTitle(Request $request)
     {
         try {
-            // Initialize an empty array to hold the final result
-            $allMonthsReport = [];
+            $query = "SELECT 
+                        title,
+                        SUM(IF(obr_month = 1, amount, 0)) AS Jan,
+                        SUM(IF(obr_month = 2, amount, 0)) AS Feb,
+                        SUM(IF(obr_month = 3, amount, 0)) AS Mar,
+                        SUM(IF(obr_month = 4, amount, 0)) AS Apr,
+                        SUM(IF(obr_month = 5, amount, 0)) AS May,
+                        SUM(IF(obr_month = 6, amount, 0)) AS Jun,
+                        SUM(IF(obr_month = 7, amount, 0)) AS Jul,
+                        SUM(IF(obr_month = 8, amount, 0)) AS Aug,
+                        SUM(IF(obr_month = 9, amount, 0)) AS Sep,
+                        SUM(IF(obr_month = 10, amount, 0)) AS `Oct`,
+                        SUM(IF(obr_month = 11, amount, 0)) AS Nov,
+                        SUM(IF(obr_month = 12, amount, 0)) AS `Dec`
+                        FROM 
+                        (
+                            SELECT 
+                                uacs.title, 
+                                transactions.obr_month, 
+                                uacs_transactions.amount
+                            FROM  uacs
+                            JOIN uacs_transactions ON uacs.id = uacs_transactions.uacs_id
+                            JOIN transactions ON transactions.id = uacs_transactions.transaction_id
+                            WHERE transactions.allocation_id = ?
+                            AND YEAR(transactions.obr_timestamp) = ?
+                        ) AS subquery
+                        GROUP BY 
+                            title
+                        ORDER BY 
+                            title";
 
-            // Get all months for the current year
-            $months = $this->getAllMonthsForYear($request->query('year'), $request->query('quarter'));
-
-            switch ($request->query('quarter')) {
-                case 1:
-                    $qtr = '1,2,3';
-                    break;
-                case 2:
-                    $qtr = '1,2,3,4,5,6';
-                    break;
-                case 3:
-                    $qtr = '1,2,3,4,5,6,7,8,9';
-                    break;
-                case 4:
-                    $qtr = '1,2,3,4,5,6,7,8,9,10,11,12';
-                    break;
-                default:
-                    break;
-            }
-
-            $transactions = DB::table('transactions')
-                                ->join('uacs_transactions', 'transactions.id', '=', 'uacs_transactions.transaction_id')
-                                ->join('uacs', 'uacs_transactions.uacs_id', '=', 'uacs.id')
-                                ->select(
-                                    DB::raw("LPAD(obr_month, 2, '0') AS month"),
-                                    'uacs.title',
-                                    DB::raw("SUM(transactions.obr_amount) AS total_obr_amount")
-                                )
-                                ->whereIn('obr_month', explode(',', $qtr))
-                                ->groupBy('obr_year', 'obr_month', 'uacs.title')
-                                ->orderBy('obr_year', 'ASC')
-                                ->orderBy('obr_month', 'ASC')
-                                ->get();
-
-            // Merge the fetched transactions with the list of months
-            foreach ($months as $month) {
-
-                $reportEntry = [
-                    'month' => $month,
-                    'total_obr_amount' => $transactions->firstWhere('month', $month)->total_obr_amount ?? 0,
-                ];
-                $allMonthsReport[$month] = $reportEntry;
-            }
-
-            return ResponseHelper::success(message: "Summary report retrieved successfully!", data: $transactions->groupBy('title'), statusCode: 200);
+            $result = DB::select($query, [$request->query('program'), $request->query('year')]);
+        
+            return ResponseHelper::success(message: "Summary report retrieved successfully!", data: $result, statusCode: 200);
         } catch (Exception $e) {
             Log::error("Unable to retrieved report: " . $e->getMessage() . " - Line No. " . $e->getLine());
             return ResponseHelper::error(message: "Unable to retrieve report! Try again. " . $e->getMessage(), statusCode: 500);
         }
-    }
-
-    /**
-     * Function: Get months
-     * @param Integer $year
-     * @return Array $months
-     */
-    public function getAllMonthsForYear($year, $qtr)
-    {
-        $months = [];
-        for ($i = 1; $i <= $qtr * 3; $i++) {
-            $months[] = Carbon::create($year, $i)->startOfMonth()->format('m');
-        }
-        return $months;
     }
 }
