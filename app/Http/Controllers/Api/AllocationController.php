@@ -74,6 +74,27 @@ class AllocationController extends Controller implements HasMiddleware
     }
 
     /**
+     * Function: Get specific allocation/program
+     * @param Integer $allocation_id
+     * @return responseJSON
+     */
+    public function show($allocation_id)
+    {
+        try {
+            $allocation = Allocation::findOrFail($allocation_id);
+
+            if ($allocation) {
+                return ResponseHelper::success(message: "Successfully retrieved a specific allocation.", data: $allocation, statusCode: 200);
+            }
+
+            return ResponseHelper::error("Unable to retrieve a specific allocation", statusCode: 500);
+        } catch (Exception $e) {
+            Log::error("Unable to retrieve a specific allocation. : " . $e->getMessage() . " - Line no. " . $e->getLine());
+            return ResponseHelper::error(message: "Unable to retrieve a specific of allocations! Try again. " . $e->getMessage(), statusCode: 500);
+        }
+    }
+
+    /**
      * Function: To store the newly added allocation to the database
      * @param App\Http\Requests\AllocationRequest $request
      * @return responseJSON

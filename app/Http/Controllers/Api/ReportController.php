@@ -80,7 +80,8 @@ class ReportController extends Controller
     public function getReportByAccountTitle(Request $request)
     {
         try {
-            $query = "SELECT 
+            if ($request->query('report') == 1) {
+                $query = "SELECT 
                         title,
                         SUM(IF(obr_month = 1, amount, 0)) AS Jan,
                         SUM(IF(obr_month = 2, amount, 0)) AS Feb,
@@ -104,12 +105,44 @@ class ReportController extends Controller
                             JOIN uacs_transactions ON uacs.id = uacs_transactions.uacs_id
                             JOIN transactions ON transactions.id = uacs_transactions.transaction_id
                             WHERE transactions.allocation_id = ?
-                            AND YEAR(transactions.obr_timestamp) = ?
+                            AND transactions.obr_year = ?
                         ) AS subquery
                         GROUP BY 
                             title
                         ORDER BY 
                             title";
+            } else {
+                $query = "SELECT 
+                        title,
+                        SUM(IF(dv_month = 1, dv_amount, 0)) AS Jan,
+                        SUM(IF(dv_month = 2, dv_amount, 0)) AS Feb,
+                        SUM(IF(dv_month = 3, dv_amount, 0)) AS Mar,
+                        SUM(IF(dv_month = 4, dv_amount, 0)) AS Apr,
+                        SUM(IF(dv_month = 5, dv_amount, 0)) AS May,
+                        SUM(IF(dv_month = 6, dv_amount, 0)) AS Jun,
+                        SUM(IF(dv_month = 7, dv_amount, 0)) AS Jul,
+                        SUM(IF(dv_month = 8, dv_amount, 0)) AS Aug,
+                        SUM(IF(dv_month = 9, dv_amount, 0)) AS Sep,
+                        SUM(IF(dv_month = 10, dv_amount, 0)) AS `Oct`,
+                        SUM(IF(dv_month = 11, dv_amount, 0)) AS Nov,
+                        SUM(IF(dv_month = 12, dv_amount, 0)) AS `Dec`
+                        FROM 
+                        (
+                            SELECT 
+                                uacs.title, 
+                                transactions.dv_month, 
+                                transactions.dv_amount
+                            FROM  uacs
+                            JOIN uacs_transactions ON uacs.id = uacs_transactions.uacs_id
+                            JOIN transactions ON transactions.id = uacs_transactions.transaction_id
+                            WHERE transactions.allocation_id = ?
+                            AND transactions.dv_year = ?
+                        ) AS subquery
+                        GROUP BY 
+                            title
+                        ORDER BY 
+                            title";
+            }
 
             $result = DB::select($query, [$request->query('program'), $request->query('year')]);
         
