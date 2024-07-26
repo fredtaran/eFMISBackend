@@ -73,7 +73,7 @@ class ReportController extends Controller
     }
 
     /**
-     * Function: Retrieve report
+     * Function: Retrieve data for report by account title
      * @param Illuminate\Http\Request $request
      * @return responseJSON
      */
@@ -82,19 +82,19 @@ class ReportController extends Controller
         try {
             if ($request->query('report') == 1) {
                 $query = "SELECT 
-                        title,
-                        SUM(IF(obr_month = 1, amount, 0)) AS Jan,
-                        SUM(IF(obr_month = 2, amount, 0)) AS Feb,
-                        SUM(IF(obr_month = 3, amount, 0)) AS Mar,
-                        SUM(IF(obr_month = 4, amount, 0)) AS Apr,
-                        SUM(IF(obr_month = 5, amount, 0)) AS May,
-                        SUM(IF(obr_month = 6, amount, 0)) AS Jun,
-                        SUM(IF(obr_month = 7, amount, 0)) AS Jul,
-                        SUM(IF(obr_month = 8, amount, 0)) AS Aug,
-                        SUM(IF(obr_month = 9, amount, 0)) AS Sep,
-                        SUM(IF(obr_month = 10, amount, 0)) AS `Oct`,
-                        SUM(IF(obr_month = 11, amount, 0)) AS Nov,
-                        SUM(IF(obr_month = 12, amount, 0)) AS `Dec`
+                            title,
+                            SUM(IF(obr_month = 1, amount, 0)) AS Jan,
+                            SUM(IF(obr_month = 2, amount, 0)) AS Feb,
+                            SUM(IF(obr_month = 3, amount, 0)) AS Mar,
+                            SUM(IF(obr_month = 4, amount, 0)) AS Apr,
+                            SUM(IF(obr_month = 5, amount, 0)) AS May,
+                            SUM(IF(obr_month = 6, amount, 0)) AS Jun,
+                            SUM(IF(obr_month = 7, amount, 0)) AS Jul,
+                            SUM(IF(obr_month = 8, amount, 0)) AS Aug,
+                            SUM(IF(obr_month = 9, amount, 0)) AS Sep,
+                            SUM(IF(obr_month = 10, amount, 0)) AS `Oct`,
+                            SUM(IF(obr_month = 11, amount, 0)) AS Nov,
+                            SUM(IF(obr_month = 12, amount, 0)) AS `Dec`
                         FROM 
                         (
                             SELECT 
@@ -113,19 +113,19 @@ class ReportController extends Controller
                             title";
             } else {
                 $query = "SELECT 
-                        title,
-                        SUM(IF(dv_month = 1, dv_amount, 0)) AS Jan,
-                        SUM(IF(dv_month = 2, dv_amount, 0)) AS Feb,
-                        SUM(IF(dv_month = 3, dv_amount, 0)) AS Mar,
-                        SUM(IF(dv_month = 4, dv_amount, 0)) AS Apr,
-                        SUM(IF(dv_month = 5, dv_amount, 0)) AS May,
-                        SUM(IF(dv_month = 6, dv_amount, 0)) AS Jun,
-                        SUM(IF(dv_month = 7, dv_amount, 0)) AS Jul,
-                        SUM(IF(dv_month = 8, dv_amount, 0)) AS Aug,
-                        SUM(IF(dv_month = 9, dv_amount, 0)) AS Sep,
-                        SUM(IF(dv_month = 10, dv_amount, 0)) AS `Oct`,
-                        SUM(IF(dv_month = 11, dv_amount, 0)) AS Nov,
-                        SUM(IF(dv_month = 12, dv_amount, 0)) AS `Dec`
+                            title,
+                            SUM(IF(dv_month = 1, dv_amount, 0)) AS Jan,
+                            SUM(IF(dv_month = 2, dv_amount, 0)) AS Feb,
+                            SUM(IF(dv_month = 3, dv_amount, 0)) AS Mar,
+                            SUM(IF(dv_month = 4, dv_amount, 0)) AS Apr,
+                            SUM(IF(dv_month = 5, dv_amount, 0)) AS May,
+                            SUM(IF(dv_month = 6, dv_amount, 0)) AS Jun,
+                            SUM(IF(dv_month = 7, dv_amount, 0)) AS Jul,
+                            SUM(IF(dv_month = 8, dv_amount, 0)) AS Aug,
+                            SUM(IF(dv_month = 9, dv_amount, 0)) AS Sep,
+                            SUM(IF(dv_month = 10, dv_amount, 0)) AS `Oct`,
+                            SUM(IF(dv_month = 11, dv_amount, 0)) AS Nov,
+                            SUM(IF(dv_month = 12, dv_amount, 0)) AS `Dec`
                         FROM 
                         (
                             SELECT 
@@ -146,6 +146,69 @@ class ReportController extends Controller
 
             $result = DB::select($query, [$request->query('program'), $request->query('year')]);
         
+            return ResponseHelper::success(message: "Summary report retrieved successfully!", data: $result, statusCode: 200);
+        } catch (Exception $e) {
+            Log::error("Unable to retrieved report: " . $e->getMessage() . " - Line No. " . $e->getLine());
+            return ResponseHelper::error(message: "Unable to retrieve report! Try again. " . $e->getMessage(), statusCode: 500);
+        }
+    }
+
+    /**
+     * Function: Retrieve data for report by program
+     * @param Illuminate\Http\Request $request
+     * @return responseJSON
+     */
+    public function getReportByProgram(Request $request)
+    {
+        try {
+            if ($request->query('report') == 1) {
+                $result = DB::table('allocations')
+                            ->join('transactions', 'transactions.allocation_id', '=', 'allocations.id')
+                            ->where('transactions.obr_year', $request->query('year'))
+                            ->select(
+                                'allocations.program',
+                                'allocations.amount as annual_allocation',
+                                DB::raw('SUM(IF(transactions.obr_month = 1, transactions.obr_amount, 0)) as Jan'),
+                                DB::raw('SUM(IF(transactions.obr_month = 2, transactions.obr_amount, 0)) as Feb'),
+                                DB::raw('SUM(IF(transactions.obr_month = 3, transactions.obr_amount, 0)) as Mar'),
+                                DB::raw('SUM(IF(transactions.obr_month = 4, transactions.obr_amount, 0)) as Apr'),
+                                DB::raw('SUM(IF(transactions.obr_month = 5, transactions.obr_amount, 0)) as May'),
+                                DB::raw('SUM(IF(transactions.obr_month = 6, transactions.obr_amount, 0)) as Jun'),
+                                DB::raw('SUM(IF(transactions.obr_month = 7, transactions.obr_amount, 0)) as Jul'),
+                                DB::raw('SUM(IF(transactions.obr_month = 8, transactions.obr_amount, 0)) as Aug'),
+                                DB::raw('SUM(IF(transactions.obr_month = 9, transactions.obr_amount, 0)) as Sep'),
+                                DB::raw('SUM(IF(transactions.obr_month = 10, transactions.obr_amount, 0)) as `Oct`'),
+                                DB::raw('SUM(IF(transactions.obr_month = 11, transactions.obr_amount, 0)) as Nov'),
+                                DB::raw('SUM(IF(transactions.obr_month = 12, transactions.obr_amount, 0)) as `Dec`')
+                            )
+                            ->groupBy(['allocations.program', 'allocations.amount'])
+                            ->orderBy('allocations.program')
+                            ->get();
+            } else {
+                $result = DB::table('allocations')
+                            ->join('transactions', 'transactions.allocation_id', '=', 'allocations.id')
+                            ->where('transactions.obr_year', $request->query('year'))
+                            ->select(
+                                'allocations.program',
+                                'allocations.amount as annual_allocation',
+                                DB::raw('SUM(IF(transactions.dv_month = 1, transactions.dv_amount, 0)) as Jan'),
+                                DB::raw('SUM(IF(transactions.dv_month = 2, transactions.dv_amount, 0)) as Feb'),
+                                DB::raw('SUM(IF(transactions.dv_month = 3, transactions.dv_amount, 0)) as Mar'),
+                                DB::raw('SUM(IF(transactions.dv_month = 4, transactions.dv_amount, 0)) as Apr'),
+                                DB::raw('SUM(IF(transactions.dv_month = 5, transactions.dv_amount, 0)) as May'),
+                                DB::raw('SUM(IF(transactions.dv_month = 6, transactions.dv_amount, 0)) as Jun'),
+                                DB::raw('SUM(IF(transactions.dv_month = 7, transactions.dv_amount, 0)) as Jul'),
+                                DB::raw('SUM(IF(transactions.dv_month = 8, transactions.dv_amount, 0)) as Aug'),
+                                DB::raw('SUM(IF(transactions.dv_month = 9, transactions.dv_amount, 0)) as Sep'),
+                                DB::raw('SUM(IF(transactions.dv_month = 10, transactions.dv_amount, 0)) as `Oct`'),
+                                DB::raw('SUM(IF(transactions.dv_month = 11, transactions.dv_amount, 0)) as Nov'),
+                                DB::raw('SUM(IF(transactions.dv_month = 12, transactions.dv_amount, 0)) as `Dec`')
+                            )
+                            ->groupBy(['allocations.program', 'allocations.amount'])
+                            ->orderBy('allocations.program')
+                            ->get();
+            }
+
             return ResponseHelper::success(message: "Summary report retrieved successfully!", data: $result, statusCode: 200);
         } catch (Exception $e) {
             Log::error("Unable to retrieved report: " . $e->getMessage() . " - Line No. " . $e->getLine());
