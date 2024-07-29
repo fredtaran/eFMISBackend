@@ -165,6 +165,7 @@ class ReportController extends Controller
                 $result = DB::table('allocations')
                             ->join('transactions', 'transactions.allocation_id', '=', 'allocations.id')
                             ->where('transactions.obr_year', $request->query('year'))
+                            ->where('allocations.fs_id', $request->query('fundSource'))
                             ->select(
                                 'allocations.program',
                                 'allocations.amount as annual_allocation',
@@ -188,6 +189,7 @@ class ReportController extends Controller
                 $result = DB::table('allocations')
                             ->join('transactions', 'transactions.allocation_id', '=', 'allocations.id')
                             ->where('transactions.obr_year', $request->query('year'))
+                            ->where('allocations.fs_id', $request->query('fundSource'))
                             ->select(
                                 'allocations.program',
                                 'allocations.amount as annual_allocation',
@@ -208,6 +210,87 @@ class ReportController extends Controller
                             ->orderBy('allocations.program')
                             ->get();
             }
+
+            return ResponseHelper::success(message: "Summary report retrieved successfully!", data: $result, statusCode: 200);
+        } catch (Exception $e) {
+            Log::error("Unable to retrieved report: " . $e->getMessage() . " - Line No. " . $e->getLine());
+            return ResponseHelper::error(message: "Unable to retrieve report! Try again. " . $e->getMessage(), statusCode: 500);
+        }
+    }
+
+    /**
+     * Function: Retrieve data for report by fund source
+     * @param Illuminate\Http\Request $request
+     * @return responseJSON
+     */
+    public function getReportByFundSource(Request $request)
+    {
+        try {
+            if ($request->query('report') == 1) {
+                $query = "SELECT
+                            `code`,
+                            SUM(IF(obr_month = 1, total_obr_amount, 0)) AS Jan,
+                            SUM(IF(obr_month = 2, total_obr_amount, 0)) AS Feb,
+                            SUM(IF(obr_month = 3, total_obr_amount, 0)) AS Mar,
+                            SUM(IF(obr_month = 4, total_obr_amount, 0)) AS Apr,
+                            SUM(IF(obr_month = 5, total_obr_amount, 0)) AS May,
+                            SUM(IF(obr_month = 6, total_obr_amount, 0)) AS Jun,
+                            SUM(IF(obr_month = 7, total_obr_amount, 0)) AS Jul,
+                            SUM(IF(obr_month = 8, total_obr_amount, 0)) AS Aug,
+                            SUM(IF(obr_month = 9, total_obr_amount, 0)) AS Sep,
+                            SUM(IF(obr_month = 10, total_obr_amount, 0)) AS `Oct`,
+                            SUM(IF(obr_month = 11, total_obr_amount, 0)) AS Nov,
+                            SUM(IF(obr_month = 12, total_obr_amount, 0)) AS `Dec`
+                        FROM (
+                            SELECT 
+                                fund_sources.`code`,
+                                transactions.obr_month,
+                                SUM(transactions.obr_amount) AS total_obr_amount
+                            FROM transactions
+                            JOIN allocations ON allocations.id = transactions.allocation_id
+                            JOIN fund_sources ON fund_sources.id = allocations.fs_id
+                            WHERE transactions.obr_year = ?
+                            AND allocations.line_id = ?
+                            GROUP BY transactions.obr_month, fund_sources.code
+                        ) AS subquery
+                        GROUP BY
+                            `code`
+                        ORDER BY
+                            `code`";
+            } else {
+                $query = "SELECT
+                            `code`,
+                            SUM(IF(dv_month = 1, total_dv_amount, 0)) AS Jan,
+                            SUM(IF(dv_month = 2, total_dv_amount, 0)) AS Feb,
+                            SUM(IF(dv_month = 3, total_dv_amount, 0)) AS Mar,
+                            SUM(IF(dv_month = 4, total_dv_amount, 0)) AS Apr,
+                            SUM(IF(dv_month = 5, total_dv_amount, 0)) AS May,
+                            SUM(IF(dv_month = 6, total_dv_amount, 0)) AS Jun,
+                            SUM(IF(dv_month = 7, total_dv_amount, 0)) AS Jul,
+                            SUM(IF(dv_month = 8, total_dv_amount, 0)) AS Aug,
+                            SUM(IF(dv_month = 9, total_dv_amount, 0)) AS Sep,
+                            SUM(IF(dv_month = 10, total_dv_amount, 0)) AS `Oct`,
+                            SUM(IF(dv_month = 11, total_dv_amount, 0)) AS Nov,
+                            SUM(IF(dv_month = 12, total_dv_amount, 0)) AS `Dec`
+                        FROM (
+                            SELECT 
+                                fund_sources.`code`,
+                                transactions.dv_month,
+                                SUM(transactions.dv_amount) AS total_dv_amount
+                            FROM transactions
+                            JOIN allocations ON allocations.id = transactions.allocation_id
+                            JOIN fund_sources ON fund_sources.id = allocations.fs_id
+                            WHERE transactions.dv_year = ?
+                            AND allocations.line_id = ?
+                            GROUP BY transactions.dv_month, fund_sources.code
+                        ) AS subquery
+                        GROUP BY
+                            `code`
+                        ORDER BY
+                            `code`";
+            }
+
+            $result = DB::select($query, [$request->query('year'), $request->query('lineItem')]);
 
             return ResponseHelper::success(message: "Summary report retrieved successfully!", data: $result, statusCode: 200);
         } catch (Exception $e) {
