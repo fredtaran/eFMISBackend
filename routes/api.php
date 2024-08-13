@@ -112,6 +112,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::get('get-report-by-account-title', [ReportController::class, 'getReportByAccountTitle']);
     Route::get('get-report-by-program', [ReportController::class, 'getReportByProgram']);
     Route::get('get-report-by-fund-source', [ReportController::class, 'getReportByFundSource']);
+    Route::post('generate-report', [ReportController::class, 'generatePdf']);
 });
 
 // Route::get('test', function() {

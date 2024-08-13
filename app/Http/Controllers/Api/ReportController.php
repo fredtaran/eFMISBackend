@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use Exception;
 use Carbon\Carbon;
 use App\Models\Uacs;
+use PDF;
 use App\Models\Allocation;
 use App\Models\Transaction;
 use Illuminate\Http\Request;
@@ -297,5 +298,19 @@ class ReportController extends Controller
             Log::error("Unable to retrieved report: " . $e->getMessage() . " - Line No. " . $e->getLine());
             return ResponseHelper::error(message: "Unable to retrieve report! Try again. " . $e->getMessage(), statusCode: 500);
         }
+    }
+
+    public function generatePdf(Request $request)
+    {
+        $data = [
+            'months' => $request->input('months'),
+            'reportDataToDisplay' => explode(",", $request->input('reportDataToDisplay'))
+        ];
+
+        $pdf = PDF::loadView('pdf.sampleReport', $data);
+        $pdf->setPaper('FOLIO', 'landscape');
+        // return view('pdf.sampleReport', $data);
+        return $pdf->stream('report.pdf');
+        // return $pdf->download('report.pdf');
     }
 }
