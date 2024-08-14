@@ -2,17 +2,19 @@
 
 namespace App\Http\Controllers\Api;
 
+use PDF;
 use Exception;
 use Carbon\Carbon;
 use App\Models\Uacs;
-use PDF;
 use App\Models\Allocation;
 use App\Models\Transaction;
 use Illuminate\Http\Request;
+use App\Exports\ReportExport;
 use App\Helper\ResponseHelper;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
+use Maatwebsite\Excel\Facades\Excel;
 
 class ReportController extends Controller
 {
@@ -312,5 +314,10 @@ class ReportController extends Controller
         // return view('pdf.sampleReport', $data);
         return $pdf->stream('report.pdf');
         // return $pdf->download('report.pdf');
+    }
+
+    public function downloadExcel(Request $request)
+    {
+        return Excel::download(new ReportExport($request->input('months'), explode(",", $request->input('reportDataToDisplay'))), 'export.xlsx', \Maatwebsite\Excel\Excel::XLSX);
     }
 }

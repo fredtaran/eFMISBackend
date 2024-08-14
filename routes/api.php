@@ -113,22 +113,5 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::get('get-report-by-program', [ReportController::class, 'getReportByProgram']);
     Route::get('get-report-by-fund-source', [ReportController::class, 'getReportByFundSource']);
     Route::post('generate-report', [ReportController::class, 'generatePdf']);
+    Route::post('generate-report-excel', [ReportController::class, 'downloadExcel']);
 });
-
-// Route::get('test', function() {
-//     $iv = openssl_random_pseudo_bytes(16);
-
-//     $binaryKey = pack('q', env('APP_KEY'));
-
-//     $data = "HAHAHHAHA, mao lge na akoa ingon. Ka remember ka atong the other day? katong nakita nato sila sa mall?";
-
-//     $ciphertext = openssl_encrypt($data, 'AES-256-CBC', $binaryKey, OPENSSL_RAW_DATA, $iv);
-//     $decrypted = openssl_decrypt($ciphertext, 'AES-256-CBC', $binaryKey, OPENSSL_RAW_DATA, $iv);
-
-//     echo "IV: ";
-//     print_r(bin2hex($iv));
-//     echo "\nCiphertext: ";
-//     print_r(bin2hex($ciphertext));
-//     echo "\nDecrypted text: ";
-//     print_r($decrypted);
-// }); 

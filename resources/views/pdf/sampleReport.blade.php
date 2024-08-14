@@ -71,6 +71,15 @@
             </tbody>
         </table>
 
+        <table style="text-align: center; margin-top: 15px;">
+            <tbody>
+                <tr>
+                    <h3>OBLIGATION PER FUND SOURCE FOR MOOE</h3>
+                    <h4>CY 2024</h4>
+                </tr>
+            </tbody>
+        </table>
+
         <table class="data">
             </tbody>
                 <tr class="header">
