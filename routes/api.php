@@ -9,6 +9,7 @@ use App\Http\Controllers\Api\UacsController;
 use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\Api\ReportController;
 use App\Http\Controllers\Api\SectionController;
+use App\Http\Controllers\Api\TWGClassificationController;
 use App\Http\Controllers\Api\DivisionController;
 use App\Http\Controllers\Api\LineItemController;
 use App\Http\Controllers\Api\AllocationController;
@@ -114,4 +115,9 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::get('get-report-by-fund-source', [ReportController::class, 'getReportByFundSource']);
     Route::post('generate-report', [ReportController::class, 'generatePdf']);
     Route::post('generate-report-excel', [ReportController::class, 'downloadExcel']);
+
+    /**
+     * Routes: TWG Classification
+     */
+    Route::apiResource('twg-classifications', TWGClassificationController::class);
 });

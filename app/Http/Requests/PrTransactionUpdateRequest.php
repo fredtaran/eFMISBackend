@@ -23,10 +23,14 @@ class PrTransactionUpdateRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'budget_no'     => ['required', 'unique:purchase_details,budget_no,' . $this->pr_id],
+            'budget_no'     => [
+                'required',
+                'unique:purchase_details,budget_no,' . $this->pr_id
+            ],
             'pr_no'         => [
                 $this->checkIfPrNoIsRequired() && $this->requiredByRole('procurement') ? 'required' : '', 
-                'unique:purchase_details,pr_no,' . $this->pr_id
+                'unique:purchase_details,pr_no,' . $this->pr_id,
+                'nullable'
             ],
             'po_no'         => $this->checkIfPoNoIsRequired() && $this->requiredByRole('procurement') ? 'required' : '',
             'line_item'     => $this->checkIfOBRDetailsIsRequired() && $this->requiredByRole('budget') ? 'required' : '',

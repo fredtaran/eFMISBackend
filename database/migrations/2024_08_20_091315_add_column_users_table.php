@@ -12,11 +12,9 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->unsignedBigInteger('division_id')->nullable();
-            $table->unsignedBigInteger('section_id')->nullable();
+            $table->unsignedBigInteger('twg_class_id')->nullable();
 
-            $table->foreign('division_id')->references('id')->on('divisions')->cascadeOnUpdate()->nullOnDelete();
-            $table->foreign('section_id')->references('id')->on('sections')->cascadeOnUpdate()->nullOnDelete();
+            $table->foreign('twg_class_id')->references('id')->on('twg_classifications')->cascadeOnUpdate()->nullOnDelete();
         });
     }
 
@@ -26,8 +24,8 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->dropForeign(['division_id', 'section_id']);
-            $table->dropColumn(['division_id', 'section_id']);
+            $table->dropForeign(['twg_class_id']);
+            $table->dropColumn(['twg_class_id']);
         });
     }
 };

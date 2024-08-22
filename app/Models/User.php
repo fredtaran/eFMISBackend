@@ -26,7 +26,8 @@ class User extends Authenticatable
         'username',
         'password',
         'division_id',
-        'section_id'
+        'section_id',
+        'twg_class_id'
     ];
 
     /**
@@ -56,5 +57,13 @@ class User extends Authenticatable
     public function division()
     {
         return $this->belongsTo(Division::class, 'division_id', 'id');
+    }
+
+    /**
+     * Return TWG
+     */
+    public function twg()
+    {
+        return $this->belongsTo(TWGClassification::class, 'twg_class_id', 'id');
     }
 }

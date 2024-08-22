@@ -22,14 +22,15 @@ class UserRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'firstname'     => ['required'],
-            'middlename'    => [''],
-            'lastname'      => ['required'],
-            'suffix'        => [''],
-            'username'      => ['required', 'unique:users,username'],
-            'division'      => ['required'],
-            'section'       => ['required'],
-            'roles'         => ['required']
+            'firstname'             => ['required'],
+            'middlename'            => [''],
+            'lastname'              => ['required'],
+            'suffix'                => [''],
+            'username'              => ['required', 'unique:users,username'],
+            'division'              => ['required'],
+            'section'               => ['required'],
+            'roles'                 => ['required'],
+            'twg_classification'    => []
         ];
     }
 

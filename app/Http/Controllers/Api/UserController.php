@@ -37,7 +37,7 @@ class UserController extends Controller implements HasMiddleware
     {
         try {
             $users = User::with('roles')
-                            ->with('division')
+                            ->with(['division', 'twg'])
                             ->get();
             
             if ($users) {
@@ -67,7 +67,8 @@ class UserController extends Controller implements HasMiddleware
                 "username"      => $request->username,
                 "division_id"   => $request->division,
                 "section_id"    => $request->section,
-                "password"      => "DOHCHDNM"
+                "password"      => "DOHCHDNM",
+                "twg_class_id"  => $request->twg_classification
             ]);
 
             if ($user) {
