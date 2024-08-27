@@ -61,8 +61,10 @@ class PurchaseDetailsController extends Controller implements HasMiddleware
     {
         try {
             $transactions = Transaction::where('creator', $userId)
-                                            ->with(['purchaseDetails'])
-                                            ->get();
+                                        ->with(['purchaseDetails'])
+                                        ->orderBy('received', 'DESC')
+                                        ->orderBy('created_at', 'DESC')
+                                        ->get();
 
             if ($transactions) {
                 return ResponseHelper::success(message: "Successfully retrieved the list of transactions.", data: $transactions, statusCode: 200);

@@ -311,9 +311,7 @@ class ReportController extends Controller
 
         $pdf = PDF::loadView('pdf.sampleReport', $data);
         $pdf->setPaper('FOLIO', 'landscape');
-        // return view('pdf.sampleReport', $data);
         return $pdf->stream('report.pdf');
-        // return $pdf->download('report.pdf');
     }
 
     public function downloadExcel(Request $request)

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Models\User;
+use PDF;
 use App\Models\Transaction;
 use Illuminate\Http\Request;
 use App\Helper\ResponseHelper;
@@ -364,6 +365,26 @@ class TransactionController extends Controller implements HasMiddleware
         } catch (Exception $e) {
             Log::error("Unable to update transaction. : " . $e->getMessage() . " - Line no. " . $e->getLine());
             return ResponseHelper::error(message: "Unable to update transaction! Try again. " . $e->getMessage(), statusCode: 500);
+        }
+    }
+
+    /**
+     * Function: Print transmittal
+     * @param Interger $transactionId
+     * @return responseJSON
+     */
+    public function printTransmittal($transactionId)
+    {
+        try {
+            $data = [];
+
+            $pdf = PDF::loadView('pdf.routingSlip');
+            $pdf->setPaper('letter', 'portrait');
+
+            return $pdf->stream('transmittal.pdf');
+        } catch (Exception $e) {
+            Log::error("Unable to produce a transmittal. : " . $e->getMessage() . " - Line no. " . $e->getLine());
+            return ResponseHelper::error(message: "Unable to produce a transmittal! Try again. " . $e->getMessage(), statusCode: 500);
         }
     }
 }

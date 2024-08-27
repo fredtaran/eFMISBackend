@@ -7,7 +7,8 @@
     </head>
     <body>
         <div class="header">
-
+            <h1>DOH CHD - NORTHERN MINDANAO</h1>
+            <h4>eFinance Management Information System</h4>
         </div>
 
         <div class="main">
