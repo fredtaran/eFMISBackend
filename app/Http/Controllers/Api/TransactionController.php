@@ -370,18 +370,23 @@ class TransactionController extends Controller implements HasMiddleware
 
     /**
      * Function: Print transmittal
-     * @param Interger $transactionId
+     * @param Integer $transactionId
      * @return responseJSON
      */
     public function printTransmittal($transactionId)
     {
         try {
-            $data = [];
+            $transaction = Transaction::where('id', $transactionId)->first();
 
-            $pdf = PDF::loadView('pdf.routingSlip');
-            $pdf->setPaper('letter', 'portrait');
+            $data = [
+                'transactionDetails'    => $transaction
+            ];
 
-            return $pdf->stream('transmittal.pdf');
+            $pdf_output = PDF::loadView('pdf.routingSlip', $data);
+            $paperSize = array(0, 0, 421, 298);
+            $pdf_output->setPaper($paperSize, 'portrait');
+
+            return $pdf_output->stream('transmittal.pdf');
         } catch (Exception $e) {
             Log::error("Unable to produce a transmittal. : " . $e->getMessage() . " - Line no. " . $e->getLine());
             return ResponseHelper::error(message: "Unable to produce a transmittal! Try again. " . $e->getMessage(), statusCode: 500);

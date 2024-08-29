@@ -4,6 +4,41 @@
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Routing Slip</title>
+        <style>
+             * {
+                margin: 0;
+                padding: 0;
+                font-family: sans-serif;
+            }
+
+            body {
+                padding: 5px;
+                font-size: 16px;
+            }
+            
+            .header {
+                text-align: center;
+            }
+
+            .header h1 {
+                font-size: 1.5rem;
+            }
+
+            table {
+                width: 100%;
+                border-collapse: collapse;
+            }
+
+            td {
+                border: 1px solid black;
+                text-align: center;
+                font-size: 0.5rem;
+            }
+
+            .main {
+                margin-top: 25px;
+            }
+        </style>
     </head>
     <body>
         <div class="header">
@@ -12,7 +47,27 @@
         </div>
 
         <div class="main">
-            
+            <table>
+                <tbody>
+                    <tr>
+                        <td>Reference Number</td>
+                        <td>{{ $transactionDetails->reference_no }}</td>
+                        <td rowspan="3" valign="middle">
+                            <img src="../public/images/DOHCHDNM.png" alt="DOH CHDNM LOGO" width="80px" height="80px">
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td>Activity/Particulars</td>
+                        <td>{{ $transactionDetails->activity_title }}</td>
+                    </tr>
+
+                    <tr>
+                        <td>Date</td>
+                        <td>{{ $transactionDetails->created_at }}</td>
+                    </tr>
+                </tbody>
+            </table>
         </div>
 
         <div class="footer">
