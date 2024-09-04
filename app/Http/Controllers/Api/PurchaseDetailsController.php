@@ -91,6 +91,8 @@ class PurchaseDetailsController extends Controller implements HasMiddleware
                                         ->orWhere('to', $userId)
                                         ->orWhere('from', $userId)
                                         ->with(['purchaseDetails'])
+                                        ->orderBy('received', 'ASC')
+                                        ->orderBy('created_at', 'DESC')
                                         ->get();
 
             if ($transactions) {

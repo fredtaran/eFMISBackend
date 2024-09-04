@@ -5,7 +5,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Routing Slip</title>
         <style>
-             * {
+            * {
                 margin: 0;
                 padding: 0;
                 font-family: sans-serif;
@@ -38,6 +38,10 @@
             .main {
                 margin-top: 25px;
             }
+
+            .header h1 {
+                color: #0039a6;
+            }
         </style>
     </head>
     <body>
@@ -52,8 +56,9 @@
                     <tr>
                         <td>Reference Number</td>
                         <td>{{ $transactionDetails->reference_no }}</td>
-                        <td rowspan="3" valign="middle">
-                            <img src="../public/images/DOHCHDNM.png" alt="DOH CHDNM LOGO" width="80px" height="80px">
+                        <td rowspan="3" valign="middle" width="90px" style="padding-left: 25px; text-align: left;">
+                            {!! DNS2D::getBarcodeHTML($transactionDetails->reference_no, 'QRCODE', 3, 3) !!}
+                            {{ $transactionDetails->reference_no }}
                         </td>
                     </tr>
 

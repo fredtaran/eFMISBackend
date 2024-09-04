@@ -208,6 +208,10 @@ class TransactionController extends Controller implements HasMiddleware
                         'dv_amount'         => $request->dv_amount,
                         'dv_month'          => $request->dv_month,
                         'dv_year'           => $request->dv_year,
+                        'dv_gross'          => $request->dv_gross,
+                        'dv_tax'            => $request->dv_tax,
+                        'dv_retention'      => $request->dv_retention,
+                        'dv_penalty'        => $request->dv_penalty,
                         'obr_unpaid'        => $request->obr_unpaid,
                         'ada_no'            => $request->ada_no,
                         'activity_title'    => $request->act_title,
@@ -251,7 +255,7 @@ class TransactionController extends Controller implements HasMiddleware
             $transaction = Transaction::findOrFail($transactionId);
 
             if ($transaction->dv_no) {
-                return ResponseHelper::success(message: "Successfully retrieved transaction detailx.", data: $transaction->dv_no, statusCode: 200);
+                return ResponseHelper::success(message: "Successfully retrieved transaction detail.", data: $transaction->dv_no, statusCode: 200);
             } else {
                 $latestDvNumber = Transaction::where('dv_no', '!=', null)->orderBy('dv_timestamp', 'ASC')->first();
 
@@ -261,12 +265,15 @@ class TransactionController extends Controller implements HasMiddleware
                     $day = date('d');
                     $newDvNumber = "DV-$year-$month-$day-001";
 
-                    return ResponseHelper::success(message: "Successfully retrieved transaction detaila.", data: $newDvNumber, statusCode: 200);
+                    return ResponseHelper::success(message: "Successfully retrieved transaction detail.", data: $newDvNumber, statusCode: 200);
                 } else {
                     $explodedDvNumber = explode('-', $latestDvNumber->dv_no);
+                    $explodedDvNumber[1] = date('Y');
+                    $explodedDvNumber[2] = date('m');
+                    $explodedDvNumber[3] = date('d');
                     $explodedDvNumber[4] = str_pad($explodedDvNumber[4] + 1, 3, '0', STR_PAD_LEFT);
                     $implodedDvNumber = implode('-', $explodedDvNumber);
-                    return ResponseHelper::success(message: "Successfully retrieved transaction detaila.", data: $implodedDvNumber, statusCode: 200);
+                    return ResponseHelper::success(message: "Successfully retrieved transaction detail.", data: $implodedDvNumber, statusCode: 200);
                 }
             }
         } catch (Exception $e) {

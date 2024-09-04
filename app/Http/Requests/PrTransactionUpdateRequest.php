@@ -49,6 +49,10 @@ class PrTransactionUpdateRequest extends FormRequest
             'dv_amount'     => $this->checkIfDvIsRequired() && $this->requiredByRole('accounting') ? 'required' : '',
             'dv_month'      => $this->checkIfDvIsRequired() && $this->requiredByRole('accounting') ? 'required' : '',
             'dv_year'       => $this->checkIfDvIsRequired() && $this->requiredByRole('accounting') ? 'required' : '',
+            'dv_gross'      => $this->checkIfDvIsRequired() && $this->requiredByRole('accounting') ? 'required' : '',
+            'dv_tax'        => $this->checkIfDvIsRequired() && $this->requiredByRole('accounting') ? 'required' : '',
+            'dv_retention'  => $this->checkIfDvIsRequired() && $this->requiredByRole('accounting') ? 'required' : '',
+            'dv_penalty'    => $this->checkIfDvIsRequired() && $this->requiredByRole('accounting') ? 'required' : '',
             'obr_unpaid'    => '',
             'ada_no'        => $this->checkIfAdaIsRequired() && $this->requiredByRole('cashier') ? 'required' : '',
             'remarks'       => '',
@@ -84,6 +88,10 @@ class PrTransactionUpdateRequest extends FormRequest
             'dv_amount.required'    => "Amount disbursed is required.",
             'dv_month.required'     => "Month disbursed is required.",
             'dv_year.required'      => "Year disbursed is required.",
+            'dv_gross.required'     => "Gross amount is required.",
+            'dv_tax.required'       => "Tax amount is required.",
+            'dv_retention.required' => "Retention amount is required.",
+            'dv_penalty.required'   => "Penalty is required.",
             'ada_no.required'       => "ADA/Check number is required.",
         ];
     }
